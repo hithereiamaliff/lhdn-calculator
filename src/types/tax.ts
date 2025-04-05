@@ -68,3 +68,39 @@ export interface TaxResult {
     tax: number;
   }[];
 }
+
+// Initial state definition
+export const initialState: TaxInput = {
+  annualIncome: 0,
+  epfContribution: 0,
+  socsoContribution: 0,
+  hasMTD: false,
+  isMarried: false,
+  assessmentType: 'single',
+  isDisabled: false,
+  hasDisabledSpouse: false,
+  parentsMedical: 0,
+  parentsExamination: 0,
+  basicSupporting: 0,
+  medicalTreatment: 0,
+  medicalCheckup: 0,
+  vaccinationCost: 0,
+  dentalTreatment: 0,
+  mentalHealth: 0,
+  educationFees: 0,
+  upskilling: 0,
+  childEducation: 0,
+  lifestyle: 0,
+  lifestyleSports: 0,
+  childCare: 0,
+  breastfeedingEquipment: 0,
+  childDisabilitySupport: 0,
+  lifeInsurance: 0,
+  educationInsurance: 0,
+  numChildrenBelow18: 0,
+  numChildrenAbove18Education: 0,
+  numDisabledChildren: 0,
+  numDisabledChildrenStudying: 0,
+  zakat: 0,
+  donations: 0,
+};
