@@ -1,4 +1,3 @@
-import React from 'react';
 import { TaxResult } from '../../types/tax';
 
 interface TaxSummaryProps {
@@ -6,7 +5,7 @@ interface TaxSummaryProps {
   formatCurrency: (amount: number) => string;
 }
 
-const TaxSummary: React.FC<TaxSummaryProps> = ({ result, formatCurrency }) => {
+const TaxSummary = ({ result, formatCurrency }: TaxSummaryProps) => {
   if (!result) return null;
 
   return (
@@ -26,6 +25,12 @@ const TaxSummary: React.FC<TaxSummaryProps> = ({ result, formatCurrency }) => {
             <span className="text-gray-600">Taxable Income</span>
             <span className="font-medium">{formatCurrency(result.taxableIncome)}</span>
           </div>
+          {(result.individualRebate > 0 || result.spouseRebate > 0) && (
+            <div className="flex justify-between text-green-600">
+              <span>Tax Rebate</span>
+              <span>-{formatCurrency(result.individualRebate + result.spouseRebate)}</span>
+            </div>
+          )}
           <div className="border-t border-gray-200 pt-2">
             <div className="flex justify-between">
               <span className="font-medium text-gray-700">Total Tax</span>

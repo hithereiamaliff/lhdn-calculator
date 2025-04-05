@@ -48,7 +48,11 @@ export const reliefLimits = {
   childCare: 3000,
   breastfeedingEquipment: 1000,
   childDisabilitySupport: 4000,
-  // Insurance
+  // EPF & Insurance
+  epf: {
+    mandatory: 4000, // Mandatory contributions or basic voluntary contributions
+    voluntary: 3000 // Additional voluntary contributions
+  },
   lifeInsurance: 7000,
   educationInsurance: 3000,
   socso: 350,
@@ -143,13 +147,16 @@ export const calculateTax = (input: TaxInput): TaxResult => {
     childDisabilitySupport: Math.min(input.childDisabilitySupport, reliefLimits.childDisabilitySupport),
     lifeInsurance: Math.min(input.lifeInsurance, reliefLimits.lifeInsurance),
     educationInsurance: Math.min(input.educationInsurance, reliefLimits.educationInsurance),
-    socsoContribution: Math.min(input.socsoContribution, reliefLimits.socso)
+    socsoContribution: Math.min(input.socsoContribution, reliefLimits.socso),
+    epfMandatoryContribution: Math.min(input.epfMandatoryContribution || 0, reliefLimits.epf.mandatory),
+    epfVoluntaryContribution: Math.min(input.epfVoluntaryContribution || 0, reliefLimits.epf.voluntary)
   };
 
   // Calculate total relief including automatic reliefs
   const totalRelief = 
     automaticReliefs +
-    limitedInput.epfContribution +
+    limitedInput.epfMandatoryContribution +
+    limitedInput.epfVoluntaryContribution +
     limitedInput.socsoContribution +
     limitedInput.parentsMedical +
     limitedInput.basicSupporting +

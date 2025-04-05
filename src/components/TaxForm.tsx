@@ -1,5 +1,6 @@
-import React, { useState, ChangeEvent, FormEvent, FC } from 'react';
-import { Calculator, ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+type InputChangeEvent = { target: HTMLInputElement | HTMLSelectElement };
 
 // Import the actual components and utilities
 import { TaxInput, TaxResult, initialState as initialTaxState } from '../types/tax'; 
@@ -15,13 +16,14 @@ const isExceedingLimit = (value: number | undefined | string, limit: number) => 
   return (numericValue || 0) > limit;
 };
 
-const TaxForm: FC = () => { 
+function TaxForm() { 
   const [input, setInput] = useState<TaxInput>(initialTaxState); 
   const [result, setResult] = useState<TaxResult | null>(null); 
-  const [currentStep, setCurrentStep] = useState<number>(1); 
-  const [errors, setErrors] = useState<Partial<Record<keyof TaxInput, string>>>({}); 
+  const [currentStep, setCurrentStep] = useState(1); 
+  const [errors, setErrors] = useState<Partial<Record<keyof TaxInput, string>>>({});
+  const [isCalculating, setIsCalculating] = useState(false); 
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { 
+  const handleInputChange = (e: InputChangeEvent) => { 
     const target = e.target as HTMLInputElement; // Assert target as HTMLInputElement for type safety
     const { name, value, type, checked } = target;
     const parsedValue = value === '' ? 0 : parseFloat(value);
@@ -39,30 +41,71 @@ const TaxForm: FC = () => {
     }
   };
 
+  const calculateTaxWithAnimation = async () => {
+    setIsCalculating(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const taxResult = calculateTax(input);
+    setResult(taxResult);
+    setIsCalculating(false);
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const nextStep = () => {
-    setCurrentStep((prev: number) => Math.min(prev + 1, 4));
+    const nextStepNumber = Math.min(currentStep + 1, 4);
+    setCurrentStep(nextStepNumber);
+    scrollToTop();
+    if (nextStepNumber === 4) {
+      calculateTaxWithAnimation();
+    }
   };
 
   const prevStep = () => {
     setCurrentStep((prev: number) => Math.max(prev - 1, 1));
+    scrollToTop();
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => { 
-    e.preventDefault();
-    const taxResult = calculateTax(input); 
-    setResult(taxResult);
-  };
+
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return <TaxPayerInfo input={input} onChange={handleInputChange} errors={errors} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} />; 
       case 2:
-        return <MandatoryContributions input={input} onChange={handleInputChange} errors={errors} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} reliefLimits={reliefLimits} />; 
+        return <MandatoryContributions input={input} onChange={handleInputChange} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} reliefLimits={reliefLimits} />; 
       case 3: 
         return <TaxReliefs input={input} onChange={handleInputChange} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} />; 
-      case 4: 
-        return <TaxSummary result={result} formatCurrency={formatCurrency} />; 
+      case 4:
+        if (isCalculating) {
+          return (
+            <div className="flex flex-col items-center justify-center p-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+              <p className="text-gray-600">Calculating your tax...</p>
+            </div>
+          );
+        }
+        return (
+          <>
+            <TaxSummary result={result} formatCurrency={formatCurrency} />
+            {result && (
+              <div className="mt-8 bg-white p-6 rounded-lg shadow">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Tax Calculation Results</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-gray-50 rounded">
+                    <p className="text-sm text-gray-600">Taxable Income</p>
+                    <p className="text-lg font-semibold">{formatCurrency(result.taxableIncome)}</p>
+                  </div>
+                  <div className="p-4 bg-blue-50 rounded">
+                    <p className="text-sm text-blue-600">Tax Payable</p>
+                    <p className="text-lg font-semibold">{formatCurrency(result.taxPayable)}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        );
       default:
         return null;
     }
@@ -70,7 +113,7 @@ const TaxForm: FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
         {renderStep()}
         <div className="flex justify-between pt-4">
           {currentStep > 1 && (
@@ -92,33 +135,10 @@ const TaxForm: FC = () => {
               Next
               <ArrowRight className="w-5 h-5 ml-2" />
             </button>
-          ) : (
-            <button
-              type="submit"
-              className="ml-auto inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              <Calculator className="w-5 h-5 mr-2" />
-              Calculate Tax
-            </button>
-          )}
+          ) : null}
         </div>
       </form>
-      {/* Results */} 
-      {result && (
-        <div className="mt-8 bg-white p-6 rounded-lg shadow">
-           <h3 className="text-xl font-bold text-gray-900 mb-4">Tax Calculation Results</h3>
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="p-4 bg-gray-50 rounded">
-               <p className="text-sm text-gray-600">Taxable Income</p>
-               <p className="text-lg font-semibold">{formatCurrency(result.taxableIncome)}</p>
-             </div>
-             <div className="p-4 bg-blue-50 rounded">
-               <p className="text-sm text-blue-600">Tax Payable</p>
-               <p className="text-lg font-semibold">{formatCurrency(result.taxPayable)}</p>
-             </div>
-           </div>
-         </div>
-      )}
+
     </div>
   );
 };

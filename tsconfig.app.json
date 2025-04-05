@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
-    "types": ["vite/client", "react"],
+    "types": ["vite/client", "node"],
+    "typeRoots": ["./node_modules/@types"],
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "skipLibCheck": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "esModuleInterop": true, // Added for import flexibility
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "allowJs": true,
+    "jsxImportSource": "react",
 
     /* Linting */
     "strict": true,

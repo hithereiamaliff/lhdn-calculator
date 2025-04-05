@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import { ChangeEvent } from 'react';
 import { TaxInput } from '../../types/tax';
 import { reliefLimits } from '../../utils/taxCalculator';
 
@@ -21,13 +21,31 @@ type TaxReliefsProps = {
   input: TaxInput;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   isExceedingLimit: (value: number | undefined | string, limit: number) => boolean;
+  formatCurrency: (amount: number) => string;
 };
 
-const TaxReliefs: FC<TaxReliefsProps> = ({
+const validateInputValue = (value: string, limit: number): string => {
+  if (value === '') return '';
+  const numValue = parseFloat(value);
+  if (isNaN(numValue) || numValue < 0) return '0';
+  return Math.min(numValue, limit).toString();
+};
+
+const createLimitedChangeHandler = (
+  originalHandler: (e: ChangeEvent<HTMLInputElement>) => void,
+  limit: number
+) => (e: ChangeEvent<HTMLInputElement>) => {
+  const validatedValue = validateInputValue(e.target.value, limit);
+  e.target.value = validatedValue;
+  originalHandler(e);
+};
+
+const TaxReliefs = ({
   input,
   onChange,
   isExceedingLimit,
-}) => {
+  formatCurrency,
+}: TaxReliefsProps) => {
   return (
     <div className="space-y-6">
       {/* Medical Expenses */}
@@ -43,7 +61,7 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="medicalTreatment"
             id="medicalTreatment"
             value={input.medicalTreatment || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.medicalTreatment.total)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.medicalTreatment, reliefLimits.medicalTreatment.total) ? 'border-red-300' : 'border-gray-300'}`}
@@ -60,12 +78,12 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="vaccinationCost"
             id="vaccinationCost"
             value={input.vaccinationCost || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.medicalTreatment.vaccination)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.vaccinationCost, reliefLimits.medicalTreatment.vaccination) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.medicalTreatment.vaccination.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.medicalTreatment.vaccination)}</p>
         </div>
 
         <div>
@@ -77,12 +95,12 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="dentalTreatment"
             id="dentalTreatment"
             value={input.dentalTreatment || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.medicalTreatment.dental)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.dentalTreatment, reliefLimits.medicalTreatment.dental) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.medicalTreatment.dental.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.medicalTreatment.dental)}</p>
         </div>
 
         <div>
@@ -94,7 +112,7 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="medicalCheckup"
             id="medicalCheckup"
             value={input.medicalCheckup || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.medicalCheckup)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.medicalCheckup, reliefLimits.medicalCheckup) ? 'border-red-300' : 'border-gray-300'}`}
@@ -111,46 +129,46 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="mentalHealth"
             id="mentalHealth"
             value={input.mentalHealth || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.mentalHealth)}
             min="0"
             step="0.01"
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.mentalHealth, reliefLimits.medicalCheckup) ? 'border-red-300' : 'border-gray-300'}`}
+            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.mentalHealth, reliefLimits.mentalHealth) ? 'border-red-300' : 'border-gray-300'}`}
           />
           <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.medicalCheckup.toLocaleString()}</p>
         </div>
 
         <div>
-          <label htmlFor="parentsMedicalCare" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="parentsMedical" className="block text-sm font-medium text-gray-700">
             Parents Medical Care (RM)
           </label>
           <input
             type="number"
-            name="parentsMedicalCare"
-            id="parentsMedicalCare"
-            value={input.parentsMedicalCare || ''}
-            onChange={onChange}
+            name="parentsMedical"
+            id="parentsMedical"
+            value={input.parentsMedical || ''}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.parentsMedical.total)}
             min="0"
             step="0.01"
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.parentsMedicalCare, reliefLimits.parentsMedical.total) ? 'border-red-300' : 'border-gray-300'}`}
+            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.parentsMedical, reliefLimits.parentsMedical.total) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.parentsMedical.total.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.parentsMedical.total)}</p>
         </div>
 
         <div>
-          <label htmlFor="parentsMedicalExamination" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="parentsExamination" className="block text-sm font-medium text-gray-700">
             Parents Medical Examination (RM)
           </label>
           <input
             type="number"
-            name="parentsMedicalExamination"
-            id="parentsMedicalExamination"
-            value={input.parentsMedicalExamination || ''}
-            onChange={onChange}
+            name="parentsExamination"
+            id="parentsExamination"
+            value={input.parentsExamination || ''}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.parentsMedical.examination)}
             min="0"
             step="0.01"
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.parentsMedicalExamination, reliefLimits.parentsMedical.examination) ? 'border-red-300' : 'border-gray-300'}`}
+            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.parentsExamination, reliefLimits.parentsMedical.examination) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.parentsMedical.examination.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.parentsMedical.examination)}</p>
         </div>
       </div>
 
@@ -167,12 +185,12 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="lifestyle"
             id="lifestyle"
             value={input.lifestyle || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.lifestyle)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.lifestyle, reliefLimits.lifestyle) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.lifestyle.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.lifestyle)}</p>
         </div>
 
         <div>
@@ -184,12 +202,12 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="lifestyleSports"
             id="lifestyleSports"
             value={input.lifestyleSports || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.lifestyleSports)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.lifestyleSports, reliefLimits.lifestyleSports) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.lifestyleSports.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.lifestyleSports)}</p>
         </div>
       </div>
 
@@ -206,12 +224,12 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="educationFees"
             id="educationFees"
             value={input.educationFees || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.educationFees.total)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.educationFees, reliefLimits.educationFees.total) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.educationFees.total.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.educationFees.total)}</p>
         </div>
 
         <div>
@@ -223,29 +241,29 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="upskilling"
             id="upskilling"
             value={input.upskilling || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.educationFees.upskilling)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.upskilling, reliefLimits.educationFees.upskilling) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.educationFees.upskilling.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.educationFees.upskilling)}</p>
         </div>
 
         <div>
-          <label htmlFor="educationSavings" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="childEducation" className="block text-sm font-medium text-gray-700">
             SSPN Education Savings (Net Deposit) (RM)
           </label>
           <input
             type="number"
-            name="educationSavings"
-            id="educationSavings"
-            value={input.educationSavings || ''}
-            onChange={onChange}
+            name="childEducation"
+            id="childEducation"
+            value={input.childEducation || ''}
+            onChange={createLimitedChangeHandler(onChange, allReliefLimits.educationSavings)}
             min="0"
             step="0.01"
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.educationSavings, allReliefLimits.educationSavings) ? 'border-red-300' : 'border-gray-300'}`}
+            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.childEducation, allReliefLimits.educationSavings) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{allReliefLimits.educationSavings.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(allReliefLimits.educationSavings)}</p>
         </div>
       </div>
 
@@ -262,12 +280,12 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="childCare"
             id="childCare"
             value={input.childCare || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.childCare)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.childCare, reliefLimits.childCare) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.childCare.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.childCare)}</p>
         </div>
 
         <div>
@@ -279,12 +297,12 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="breastfeedingEquipment"
             id="breastfeedingEquipment"
             value={input.breastfeedingEquipment || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, allReliefLimits.breastfeeding)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.breastfeedingEquipment, allReliefLimits.breastfeeding) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{allReliefLimits.breastfeeding.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(allReliefLimits.breastfeeding)}</p>
         </div>
 
         <div>
@@ -296,12 +314,12 @@ const TaxReliefs: FC<TaxReliefsProps> = ({
             name="childDisabilitySupport"
             id="childDisabilitySupport"
             value={input.childDisabilitySupport || ''}
-            onChange={onChange}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.childDisabilitySupport)}
             min="0"
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.childDisabilitySupport, reliefLimits.childDisabilitySupport) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to RM{reliefLimits.childDisabilitySupport.toLocaleString()}</p>
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.childDisabilitySupport)}</p>
         </div>
       </div>
     </div>

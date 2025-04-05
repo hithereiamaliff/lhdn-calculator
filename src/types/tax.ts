@@ -9,7 +9,8 @@ export type AssessmentType = 'single' | 'separate' | 'joint';
 
 export interface TaxInput {
   annualIncome: number;
-  epfContribution: number;
+  epfMandatoryContribution: number;
+  epfVoluntaryContribution: number;
   socsoContribution: number;
   hasMTD: boolean;
   isMarried: boolean;
@@ -72,7 +73,8 @@ export interface TaxResult {
 // Initial state definition
 export const initialState: TaxInput = {
   annualIncome: 0,
-  epfContribution: 0,
+  epfMandatoryContribution: 0,
+  epfVoluntaryContribution: 0,
   socsoContribution: 0,
   hasMTD: false,
   isMarried: false,
