@@ -85,32 +85,35 @@ const SPOUSE_REBATE = 400;
 export const calculateTax = (input: TaxInput): TaxResult => {
   // Calculate non-taxable threshold based on assessment type
   let nonTaxableThreshold = THRESHOLDS.single;
+  const numChildren = input.numChildrenBelow18 + input.numChildrenAbove18Education;
   
-  if (input.isMarried) {
-    const childCount = input.numChildrenBelow18 + input.numChildrenAbove18Education;
-    const thresholds = THRESHOLDS[input.assessmentType === 'joint' ? 'joint' : 'separate'];
+  // Only apply married thresholds if the assessment type is not single
+  if (input.assessmentType !== 'single') {
+    const thresholds = THRESHOLDS[input.assessmentType];
     
-    if (childCount >= 2) {
+    if (numChildren >= 2) {
       nonTaxableThreshold = thresholds.twoChildren;
-    } else if (childCount === 1) {
+    } else if (numChildren === 1) {
       nonTaxableThreshold = thresholds.oneChild;
     } else {
       nonTaxableThreshold = thresholds.noChild;
     }
   }
 
-  // Check MTD and income threshold eligibility
-  const eligibleForTax = input.annualIncome > nonTaxableThreshold && input.hasMTD;
+  // Check if income exceeds threshold
+  const exceedsThreshold = input.annualIncome > nonTaxableThreshold;
 
   // Calculate automatic reliefs
-  const automaticReliefs = reliefLimits.individual + 
-    (input.isDisabled ? reliefLimits.disabled : 0) +
-    (input.hasDisabledSpouse ? reliefLimits.disabledSpouse : 0) +
-    (input.isMarried ? reliefLimits.spouse : 0) +
-    (input.numChildrenBelow18 * reliefLimits.childBelow18) +
-    (input.numChildrenAbove18Education * reliefLimits.childAbove18Education) +
-    (input.numDisabledChildren * reliefLimits.disabledChild) +
-    (input.numDisabledChildrenStudying * reliefLimits.disabledChildStudying);
+  const isMarriedAssessment = input.assessmentType === 'separate' || input.assessmentType === 'joint';
+  const automaticReliefs = reliefLimits.individual + // RM9,000 basic individual relief
+    (isMarriedAssessment ? reliefLimits.spouse : 0) + // RM4,000 spouse relief for separate/joint assessment
+    (input.numChildrenBelow18 * reliefLimits.childBelow18) + // RM2,000 per child under 18
+    (input.numChildrenAbove18Education * reliefLimits.childAbove18Education) + // RM2,000 per child above 18 in education
+    (input.isDisabled ? reliefLimits.disabled : 0) + // Additional relief if individual is disabled
+    (isMarriedAssessment && input.hasDisabledSpouse ? reliefLimits.disabledSpouse : 0) + // Additional relief if spouse is disabled (only for married)
+    (input.numDisabledChildren * reliefLimits.disabledChild) + // Additional relief for disabled children
+    (input.numDisabledChildrenStudying * reliefLimits.disabledChildStudying); // Additional relief for disabled children studying
+
   // Apply relief limits
   const limitedInput = {
     ...input,
@@ -216,19 +219,41 @@ export const calculateTax = (input: TaxInput): TaxResult => {
   }
 
   // Apply rebates
-  totalTax = Math.max(0, totalTax - individualRebate - spouseRebate);
+  const totalRebates = individualRebate + spouseRebate;
+  const taxPayable = Math.max(0, totalTax - totalRebates);
+
+  // If income is below threshold, return zero tax
+  if (!exceedsThreshold) {
+    return {
+      totalIncome: input.annualIncome,
+      totalRelief: 0,
+      taxableIncome: 0,
+      taxPayable: 0,
+      totalTax: 0,
+      eligibleForTax: false,
+      individualRebate: 0,
+      spouseRebate: 0,
+      effectiveRate: 0,
+      nonTaxableThreshold,
+      assessmentType: input.assessmentType,
+      numChildren,
+      taxBracketBreakdown: []
+    };
+  }
 
   return {
     totalIncome: input.annualIncome,
     totalRelief,
     taxableIncome,
-    taxPayable: totalTax,
-    totalTax,
-    eligibleForTax,
+    taxPayable,
+    totalTax: Math.max(0, taxPayable - totalRebates),
+    eligibleForTax: exceedsThreshold && input.hasMTD,
     individualRebate,
     spouseRebate,
-    effectiveRate: totalTax > 0 ? (totalTax / taxableIncome) * 100 : 0,
+    effectiveRate: (taxPayable / input.annualIncome) * 100,
     nonTaxableThreshold,
+    assessmentType: input.assessmentType,
+    numChildren,
     taxBracketBreakdown: breakdown
   };
 };

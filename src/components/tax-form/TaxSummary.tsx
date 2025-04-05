@@ -8,6 +8,27 @@ interface TaxSummaryProps {
 const TaxSummary = ({ result, formatCurrency }: TaxSummaryProps) => {
   if (!result) return null;
 
+  const getThresholdMessage = () => {
+    const { assessmentType, numChildren } = result;
+    
+    if (!assessmentType || assessmentType === 'single') {
+      return 'You won\'t be taxed if your annual employment income is';
+    }
+
+    const assessmentText = assessmentType === 'joint' ? 'Joint Assessment' : 'Separate Assessment';
+    let childrenText;
+    
+    if (numChildren === 0) {
+      childrenText = 'no children';
+    } else if (numChildren === 1) {
+      childrenText = 'one child';
+    } else {
+      childrenText = 'two or more children';
+    }
+
+    return `Under ${assessmentText} with ${childrenText}, you won't be taxed if your annual employment income is`;
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-700">Tax Summary</h3>
@@ -42,7 +63,7 @@ const TaxSummary = ({ result, formatCurrency }: TaxSummaryProps) => {
       {result.nonTaxableThreshold > 0 && (
         <div className="rounded-lg bg-yellow-50 p-4">
           <p className="text-sm text-yellow-800">
-            Note: You won't be taxed if your annual employment income is {formatCurrency(result.nonTaxableThreshold)} and below.
+            {getThresholdMessage()} {formatCurrency(result.nonTaxableThreshold)} and below.
           </p>
         </div>
       )}
