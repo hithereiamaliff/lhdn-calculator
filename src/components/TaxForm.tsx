@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
 type InputChangeEvent = { target: HTMLInputElement | HTMLSelectElement };
 
 // Import the actual components and utilities
@@ -7,6 +7,7 @@ import { TaxInput, TaxResult, initialState as initialTaxState } from '../types/t
 import { calculateTax, reliefLimits } from '../utils/taxCalculator'; 
 import { formatCurrency } from '../utils/formatter'; 
 import TaxPayerInfo from './tax-form/TaxPayerInfo';
+import Disclaimer from './tax-form/Disclaimer';
 import MandatoryContributions from './tax-form/MandatoryContributions';
 import TaxReliefs from './tax-form/TaxReliefs';
 import TaxSummary from './tax-form/TaxSummary';
@@ -81,7 +82,12 @@ function TaxForm() {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <TaxPayerInfo input={input} onChange={handleInputChange} errors={errors} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} />; 
+        return (
+          <>
+            <Disclaimer />
+            <TaxPayerInfo input={input} onChange={handleInputChange} errors={errors} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} />
+          </>
+        ); 
       case 2:
         return <MandatoryContributions input={input} onChange={handleInputChange} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} reliefLimits={reliefLimits} />; 
       case 3: 
@@ -133,7 +139,7 @@ function TaxForm() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-6 mb-12">
         {renderStep()}
         <div className="flex justify-between pt-4">
           {currentStep > 1 && (
@@ -159,6 +165,19 @@ function TaxForm() {
         </div>
       </form>
 
+      {/* Source reference */}
+      <div className="text-center text-sm text-gray-500 border-t pt-8">
+        <p className="mb-2">Tax information sourced from:</p>
+        <a
+          href="https://www.hasil.gov.my/en/individual/introduction-individual-income-tax/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+        >
+          LHDN Official Website
+          <ExternalLink className="w-4 h-4 ml-1" />
+        </a>
+      </div>
     </div>
   );
 };
