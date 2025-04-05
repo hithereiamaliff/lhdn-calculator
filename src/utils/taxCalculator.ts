@@ -199,7 +199,7 @@ export const calculateTax = (input: TaxInput): TaxResult => {
     if (remainingIncome <= 0) break;
 
     const bracketMax = bracket.max ?? Infinity;
-    const bracketRange = bracketMax - bracket.min + 1;
+    const bracketRange = bracketMax - bracket.min;
     const bracketAmount = Math.min(remainingIncome, bracketRange);
 
     if (bracketAmount <= 0) continue;
@@ -219,7 +219,7 @@ export const calculateTax = (input: TaxInput): TaxResult => {
 
   // Apply rebates
   const totalRebates = individualRebate + spouseRebate;
-  const taxPayable = Math.max(0, totalTax - totalRebates);
+  const finalTax = Math.max(0, totalTax - totalRebates);
 
   // If income is below threshold, return zero tax
   if (!exceedsThreshold) {
@@ -244,12 +244,12 @@ export const calculateTax = (input: TaxInput): TaxResult => {
     totalIncome: input.annualIncome,
     totalRelief,
     taxableIncome,
-    taxPayable,
-    totalTax: Math.max(0, taxPayable - totalRebates),
+    taxPayable: finalTax,
+    totalTax: finalTax,
     eligibleForTax: exceedsThreshold && input.hasMTD,
     individualRebate,
     spouseRebate,
-    effectiveRate: (taxPayable / input.annualIncome) * 100,
+    effectiveRate: (finalTax / input.annualIncome) * 100,
     nonTaxableThreshold,
     assessmentType: input.assessmentType,
     numChildren,
