@@ -53,6 +53,15 @@ function TaxForm() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleRestart = () => {
+    setInput(initialTaxState);
+    setResult(null);
+    setCurrentStep(1);
+    setErrors({});
+    setIsCalculating(false);
+    scrollToTop();
+  };
+
   const nextStep = () => {
     const nextStepNumber = Math.min(currentStep + 1, 4);
     setCurrentStep(nextStepNumber);
@@ -90,17 +99,28 @@ function TaxForm() {
           <>
             <TaxSummary result={result} formatCurrency={formatCurrency} />
             {result && (
-              <div className="mt-8 bg-white p-6 rounded-lg shadow">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Tax Calculation Results</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-gray-50 rounded">
-                    <p className="text-sm text-gray-600">Taxable Income</p>
-                    <p className="text-lg font-semibold">{formatCurrency(result.taxableIncome)}</p>
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-lg shadow">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Tax Calculation Results</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-gray-50 rounded">
+                      <p className="text-sm text-gray-600">Taxable Income</p>
+                      <p className="text-lg font-semibold">{formatCurrency(result.taxableIncome)}</p>
+                    </div>
+                    <div className="p-4 bg-blue-50 rounded">
+                      <p className="text-sm text-blue-600">Tax Payable</p>
+                      <p className="text-lg font-semibold">{formatCurrency(result.taxPayable)}</p>
+                    </div>
                   </div>
-                  <div className="p-4 bg-blue-50 rounded">
-                    <p className="text-sm text-blue-600">Tax Payable</p>
-                    <p className="text-lg font-semibold">{formatCurrency(result.taxPayable)}</p>
-                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <button
+                    type="button"
+                    onClick={handleRestart}
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+                  >
+                    Start New Calculation
+                  </button>
                 </div>
               </div>
             )}
