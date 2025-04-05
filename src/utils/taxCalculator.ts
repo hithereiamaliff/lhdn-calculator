@@ -106,11 +106,10 @@ export const calculateTax = (input: TaxInput): TaxResult => {
   // Calculate automatic reliefs
   const isMarriedAssessment = input.assessmentType === 'separate' || input.assessmentType === 'joint';
   const automaticReliefs = reliefLimits.individual + // RM9,000 basic individual relief
-    (isMarriedAssessment ? reliefLimits.spouse : 0) + // RM4,000 spouse relief for separate/joint assessment
+    (isMarriedAssessment ? (input.hasDisabledSpouse ? reliefLimits.disabledSpouse : reliefLimits.spouse) : 0) + // RM5,000 for disabled spouse or RM4,000 for regular spouse relief
     (input.numChildrenBelow18 * reliefLimits.childBelow18) + // RM2,000 per child under 18
     (input.numChildrenAbove18Education * reliefLimits.childAbove18Education) + // RM2,000 per child above 18 in education
     (input.isDisabled ? reliefLimits.disabled : 0) + // Additional relief if individual is disabled
-    (isMarriedAssessment && input.hasDisabledSpouse ? reliefLimits.disabledSpouse : 0) + // Additional relief if spouse is disabled (only for married)
     (input.numDisabledChildren * reliefLimits.disabledChild) + // Additional relief for disabled children
     (input.numDisabledChildrenStudying * reliefLimits.disabledChildStudying); // Additional relief for disabled children studying
 

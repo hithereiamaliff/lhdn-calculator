@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { useState } from 'react';
+import MTDInfoModal from '../modals/MTDInfoModal';
 import { TaxInput } from '../../types/tax';
 
 interface TaxPayerInfoProps {
@@ -7,6 +8,7 @@ interface TaxPayerInfoProps {
 }
 
 const TaxPayerInfo = ({ input, onChange }: TaxPayerInfoProps) => {
+  const [showMTDInfo, setShowMTDInfo] = useState(false);
   const handleAssessmentChange = (e: { target: { value: string } }) => {
     const newAssessmentType = e.target.value;
     
@@ -57,6 +59,7 @@ const TaxPayerInfo = ({ input, onChange }: TaxPayerInfoProps) => {
   const showChildrenInputs = input.assessmentType === 'separate' || input.assessmentType === 'joint';
 
   return (
+    <>
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-700">Basic Information</h3>
@@ -132,10 +135,22 @@ const TaxPayerInfo = ({ input, onChange }: TaxPayerInfoProps) => {
                 type="checkbox"
                 name="hasMTD"
                 checked={input.hasMTD}
-                onChange={onChange}
+                onChange={(e) => {
+                  onChange(e);
+                  setShowMTDInfo(true);
+                }}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm text-gray-600">Has Monthly Tax Deduction (PCB/MTD)</span>
+              <button
+                type="button"
+                onClick={() => setShowMTDInfo(true)}
+                className="ml-1 text-blue-500 hover:text-blue-600"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
             </label>
           </div>
 
@@ -173,14 +188,15 @@ const TaxPayerInfo = ({ input, onChange }: TaxPayerInfoProps) => {
           <li>Individual Relief: RM9,000</li>
           {input.isDisabled && <li>Disabled Individual Relief: RM6,000</li>}
           {(input.assessmentType === 'separate' || input.assessmentType === 'joint') && (
-            <>
-              <li>Spouse Relief: RM4,000</li>
-              {input.hasDisabledSpouse && <li>Disabled Spouse Relief: RM5,000</li>}
-            </>
+            <li>
+              {input.hasDisabledSpouse ? 'Disabled Spouse Relief: RM5,000' : 'Spouse Relief: RM4,000'}
+            </li>
           )}
         </ul>
       </div>
     </div>
+    <MTDInfoModal isOpen={showMTDInfo} onClose={() => setShowMTDInfo(false)} />
+    </>
   );
 };
 
