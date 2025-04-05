@@ -165,18 +165,31 @@ function TaxForm() {
         </div>
       </form>
 
-      {/* Source reference */}
-      <div className="text-center text-sm text-gray-500 border-t pt-8">
-        <p className="mb-2">Tax information sourced from:</p>
-        <a
-          href="https://www.hasil.gov.my/en/individual/introduction-individual-income-tax/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center text-blue-600 hover:text-blue-800"
-        >
-          LHDN Official Website
-          <ExternalLink className="w-4 h-4 ml-1" />
-        </a>
+      {/* Source reference and credits */}
+      <div className="text-center text-sm text-gray-500 border-t pt-8 space-y-4">
+        <div>
+          <span>Tax information from: </span>
+          <a
+            href="https://www.hasil.gov.my/en/individual/introduction-individual-income-tax/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-blue-600 hover:text-blue-800"
+          >
+            LHDN Official Website
+            <ExternalLink className="w-4 h-4 ml-1" />
+          </a>
+        </div>
+        <div>
+          Made with <span className="text-red-500">❤️</span> by{' '}
+          <a
+            href="https://mynameisaliff.co.uk/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800"
+          >
+            Aliff
+          </a>
+        </div>
       </div>
     </div>
   );
