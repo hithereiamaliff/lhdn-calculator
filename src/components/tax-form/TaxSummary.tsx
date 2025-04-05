@@ -42,7 +42,7 @@ const TaxSummary = ({ result, formatCurrency }: TaxSummaryProps) => {
       {result.nonTaxableThreshold > 0 && (
         <div className="rounded-lg bg-yellow-50 p-4">
           <p className="text-sm text-yellow-800">
-            Note: The first {formatCurrency(result.nonTaxableThreshold)} of your income is not taxable based on your assessment type and status.
+            Note: You won't be taxed if your annual employment income is {formatCurrency(result.nonTaxableThreshold)} and below.
           </p>
         </div>
       )}
