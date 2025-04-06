@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react';
+import type { ChangeEvent } from 'react';
 import { TaxInput } from '../../types/tax';
 import { reliefLimits } from '../../utils/taxCalculator';
 
@@ -28,7 +28,10 @@ const validateInputValue = (value: string, limit: number): string => {
   if (value === '') return '';
   const numValue = parseFloat(value);
   if (isNaN(numValue) || numValue < 0) return '0';
-  return Math.min(numValue, limit).toString();
+  const limitedValue = Math.min(numValue, limit);
+  // Preserve the exact decimal places from the input
+  const decimalPlaces = value.includes('.') ? value.split('.')[1].length : 0;
+  return limitedValue.toFixed(decimalPlaces);
 };
 
 const createLimitedChangeHandler = (
@@ -172,6 +175,45 @@ const TaxReliefs = ({
         </div>
       </div>
 
+      {/* Savings & Retirement */}
+      <div className="space-y-4 border-b pb-4">
+        <h4 className="text-md font-medium text-gray-700">Savings & Retirement</h4>
+        
+        <div>
+          <label htmlFor="sspnDeposit" className="block text-sm font-medium text-gray-700">
+            SSPN Net Deposit (RM)
+          </label>
+          <input
+            type="number"
+            name="sspnDeposit"
+            id="sspnDeposit"
+            value={input.sspnDeposit || ''}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.sspn)}
+            min="0"
+            step="0.01"
+            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.sspnDeposit, reliefLimits.sspn) ? 'border-red-300' : 'border-gray-300'}`}
+          />
+          <p className="mt-1 text-sm text-gray-500">Net deposit (Deposit - Withdrawal) limited to {formatCurrency(reliefLimits.sspn)}</p>
+        </div>
+
+        <div>
+          <label htmlFor="deferredAnnuityPrs" className="block text-sm font-medium text-gray-700">
+            Deferred Annuity and Private Retirement Scheme (PRS) (RM)
+          </label>
+          <input
+            type="number"
+            name="deferredAnnuityPrs"
+            id="deferredAnnuityPrs"
+            value={input.deferredAnnuityPrs || ''}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.deferredAnnuityPrs)}
+            min="0"
+            step="0.01"
+            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.deferredAnnuityPrs, reliefLimits.deferredAnnuityPrs) ? 'border-red-300' : 'border-gray-300'}`}
+          />
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.deferredAnnuityPrs)}</p>
+        </div>
+      </div>
+
       {/* Lifestyle */}
       <div className="space-y-4 border-b pb-4">
         <h4 className="text-md font-medium text-gray-700">Lifestyle</h4>
@@ -208,6 +250,23 @@ const TaxReliefs = ({
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.lifestyleSports, reliefLimits.lifestyleSports) ? 'border-red-300' : 'border-gray-300'}`}
           />
           <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.lifestyleSports)}</p>
+        </div>
+
+        <div>
+          <label htmlFor="evChargingFacilities" className="block text-sm font-medium text-gray-700">
+            Electric Vehicle Charging Facilities (RM)
+          </label>
+          <input
+            type="number"
+            name="evChargingFacilities"
+            id="evChargingFacilities"
+            value={input.evChargingFacilities || ''}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.evChargingFacilities)}
+            min="0"
+            step="0.01"
+            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.evChargingFacilities, reliefLimits.evChargingFacilities) ? 'border-red-300' : 'border-gray-300'}`}
+          />
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.evChargingFacilities)}</p>
         </div>
       </div>
 
@@ -249,22 +308,6 @@ const TaxReliefs = ({
           <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.educationFees.upskilling)}</p>
         </div>
 
-        <div>
-          <label htmlFor="childEducation" className="block text-sm font-medium text-gray-700">
-            SSPN Education Savings (Net Deposit) (RM)
-          </label>
-          <input
-            type="number"
-            name="childEducation"
-            id="childEducation"
-            value={input.childEducation || ''}
-            onChange={createLimitedChangeHandler(onChange, allReliefLimits.educationSavings)}
-            min="0"
-            step="0.01"
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.childEducation, allReliefLimits.educationSavings) ? 'border-red-300' : 'border-gray-300'}`}
-          />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(allReliefLimits.educationSavings)}</p>
-        </div>
       </div>
 
       {/* Child Care */}

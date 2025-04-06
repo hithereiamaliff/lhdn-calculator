@@ -50,6 +50,10 @@ export interface TaxInput {
   // Others
   zakat: number;
   donations: number;
+  // New reliefs
+  deferredAnnuityPrs: number;
+  sspnDeposit: number; // Net deposit amount (total deposit minus withdrawal)
+  evChargingFacilities: number;
 }
 
 export interface TaxResult {
@@ -99,6 +103,9 @@ export const initialState: TaxInput = {
   childCare: 0,
   breastfeedingEquipment: 0,
   childDisabilitySupport: 0,
+  deferredAnnuityPrs: 0,
+  sspnDeposit: 0,
+  evChargingFacilities: 0,
   lifeInsurance: 0,
   educationInsurance: 0,
   numChildrenBelow18: 0,

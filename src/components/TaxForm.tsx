@@ -27,7 +27,8 @@ function TaxForm() {
   const handleInputChange = (e: InputChangeEvent) => { 
     const target = e.target as HTMLInputElement; // Assert target as HTMLInputElement for type safety
     const { name, value, type, checked } = target;
-    const parsedValue = value === '' ? 0 : parseFloat(value);
+    // Parse value while maintaining exact precision
+    const parsedValue = value === '' ? 0 : Number(value);
 
     setInput((prev: TaxInput) => ({ 
       ...prev,

@@ -56,11 +56,15 @@ export const reliefLimits = {
   lifeInsurance: 7000,
   educationInsurance: 3000,
   socso: 350,
+  deferredAnnuityPrs: 3000, // Deferred Annuity and Private Retirement Scheme
   // Children
   childBelow18: 2000,
   childAbove18Education: 2000,
   disabledChild: 6000,
-  disabledChildStudying: 8000
+  disabledChildStudying: 8000,
+  // Others
+  sspn: 8000, // Skim Simpanan Pendidikan Nasional
+  evChargingFacilities: 2500 // Electric Vehicle Charging Facilities
 };
 
 // Non-taxable income thresholds
@@ -151,7 +155,10 @@ export const calculateTax = (input: TaxInput): TaxResult => {
     educationInsurance: Math.min(input.educationInsurance, reliefLimits.educationInsurance),
     socsoContribution: Math.min(input.socsoContribution, reliefLimits.socso),
     epfMandatoryContribution: Math.min(input.epfMandatoryContribution || 0, reliefLimits.epf.mandatory),
-    epfVoluntaryContribution: Math.min(input.epfVoluntaryContribution || 0, reliefLimits.epf.voluntary)
+    epfVoluntaryContribution: Math.min(input.epfVoluntaryContribution || 0, reliefLimits.epf.voluntary),
+    deferredAnnuityPrs: Math.min(input.deferredAnnuityPrs || 0, reliefLimits.deferredAnnuityPrs),
+    sspnNetDeposit: Math.min(input.sspnDeposit || 0, reliefLimits.sspn),
+    evChargingFacilities: Math.min(input.evChargingFacilities || 0, reliefLimits.evChargingFacilities)
   };
 
   // Calculate total relief including automatic reliefs
@@ -177,7 +184,10 @@ export const calculateTax = (input: TaxInput): TaxResult => {
     limitedInput.lifeInsurance +
     limitedInput.educationInsurance +
     limitedInput.zakat +
-    limitedInput.donations;
+    limitedInput.donations +
+    limitedInput.deferredAnnuityPrs +
+    limitedInput.sspnNetDeposit +
+    limitedInput.evChargingFacilities;
 
   // Calculate taxable income
   const taxableIncome = Math.max(0, input.annualIncome - totalRelief);
