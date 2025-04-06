@@ -123,8 +123,8 @@ For more detailed information about Malaysian income tax, please refer to these 
 
 1. Clone the repository
 ```bash
-git clone https://github.com/hithereiamaliff/lhdncalculator.git
-cd lhdncalculator
+git clone https://github.com/hithereiamaliff/lhdn-calculator.git
+cd lhdn-calculator
 ```
 
 2. Install dependencies
