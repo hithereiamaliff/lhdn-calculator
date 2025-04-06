@@ -2,6 +2,8 @@
 
 An unofficial modern web application to calculate Malaysian personal income tax based on the latest 2024 tax rates and reliefs.
 
+Try me 👉🏻 https://lhdn-calculator.mynameisaliff.co.uk
+
 ## Features
 
 - Accurate tax calculation based on 2024 LHDN tax brackets
