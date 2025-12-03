@@ -1,0 +1,11 @@
+# robots.txt for LHDN Tax Calculator
+# https://lhdn-calculator.techmavie.digital
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://lhdn-calculator.techmavie.digital/sitemap.xml
+
+# Crawl-delay (optional, for polite crawling)
+Crawl-delay: 1
