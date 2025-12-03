@@ -62,7 +62,7 @@ export function URLVerifyModal({ isOpen, onClose, targetUrl, siteName = 'externa
                 )}
                 {targetUrl.includes('hasil.gov.my') && (
                   <p className="text-gray-500 text-xs">
-                    This is the official LHDN website by the Malaysian government.
+                    This is the official LHDN (Inland Revenue Board of Malaysia) website by the Malaysian government.
                   </p>
                 )}
                 
