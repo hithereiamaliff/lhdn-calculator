@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
-type InputChangeEvent = { target: HTMLInputElement | HTMLSelectElement };
+import { ArrowLeft, ArrowRight, ExternalLink, Github } from 'lucide-react';
+import URLVerifyModal from './URLVerifyModal';
+type InputChangeEvent = { target: { name: string; value: string; type: string; checked?: boolean } };
 
 // Import the actual components and utilities
 import { TaxInput, TaxResult, initialState as initialTaxState } from '../types/tax'; 
@@ -17,16 +18,28 @@ const isExceedingLimit = (value: number | undefined | string, limit: number) => 
   return (numericValue || 0) > limit;
 };
 
+interface ExternalLinkInfo {
+  url: string;
+  siteName: string;
+}
+
 function TaxForm() { 
   const [input, setInput] = useState<TaxInput>(initialTaxState); 
   const [result, setResult] = useState<TaxResult | null>(null); 
   const [currentStep, setCurrentStep] = useState(1); 
   const [errors, setErrors] = useState<Partial<Record<keyof TaxInput, string>>>({});
-  const [isCalculating, setIsCalculating] = useState(false); 
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [externalLink, setExternalLink] = useState<ExternalLinkInfo>({ url: '', siteName: '' });
+
+  const handleExternalLinkClick = (e: React.MouseEvent, url: string, siteName: string) => {
+    e.preventDefault();
+    setExternalLink({ url, siteName });
+    setModalOpen(true);
+  }; 
 
   const handleInputChange = (e: InputChangeEvent) => { 
-    const target = e.target as HTMLInputElement; // Assert target as HTMLInputElement for type safety
-    const { name, value, type, checked } = target;
+    const { name, value, type, checked } = e.target;
     // Parse value while maintaining exact precision
     const parsedValue = value === '' ? 0 : Number(value);
 
@@ -86,7 +99,7 @@ function TaxForm() {
         return (
           <>
             <Disclaimer />
-            <TaxPayerInfo input={input} onChange={handleInputChange} errors={errors} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} />
+            <TaxPayerInfo input={input} onChange={handleInputChange} />
           </>
         ); 
       case 2:
@@ -171,27 +184,45 @@ function TaxForm() {
         <div>
           <span>Tax information from: </span>
           <a
-            href="https://www.hasil.gov.my/en/individual/introduction-individual-income-tax/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800"
+            href="#"
+            onClick={(e) => handleExternalLinkClick(e, 'https://www.hasil.gov.my/en/individual/introduction-individual-income-tax/', 'LHDN Official Website')}
+            className="inline-flex items-center text-blue-600 hover:text-blue-800 cursor-pointer"
           >
             LHDN Official Website
             <ExternalLink className="w-4 h-4 ml-1" />
           </a>
         </div>
-        <div>
-          Made with <span className="text-red-500">❤️</span> by{' '}
+        <div className="flex items-center justify-center flex-wrap gap-1">
+          <span>Made with</span>
+          <span className="text-red-500">❤️</span>
+          <span>by</span>
           <a
-            href="https://mynameisaliff.co.uk/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800"
+            href="#"
+            onClick={(e) => handleExternalLinkClick(e, 'https://techmavie.digital', 'TechMavie Digital')}
+            className="text-blue-600 hover:text-blue-800 cursor-pointer"
           >
-            Aliff
+            TechMavie Digital
+          </a>
+          <span className="mx-1">|</span>
+          <Github className="w-4 h-4 inline" />
+          <span className="ml-1">View</span>{' '}
+          <a
+            href="#"
+            onClick={(e) => handleExternalLinkClick(e, 'https://github.com/hithereiamaliff/lhdn-calculator', 'GitHub Repository')}
+            className="text-blue-600 hover:text-blue-800 cursor-pointer"
+          >
+            source code on GitHub
           </a>
         </div>
       </div>
+
+      {/* URL Verify Modal */}
+      <URLVerifyModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        targetUrl={externalLink.url}
+        siteName={externalLink.siteName}
+      />
     </div>
   );
 };
