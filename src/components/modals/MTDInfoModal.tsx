@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface MTDInfoModalProps {
   isOpen: boolean;
@@ -6,6 +7,8 @@ interface MTDInfoModalProps {
 }
 
 const MTDInfoModal = ({ isOpen, onClose }: MTDInfoModalProps) => {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
@@ -13,7 +16,7 @@ const MTDInfoModal = ({ isOpen, onClose }: MTDInfoModalProps) => {
       <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
       <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
         <div className="mb-4 flex items-start justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Monthly Tax Deduction (PCB/MTD)</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('modals.mtd.title')}</h3>
           <button
             onClick={onClose}
             className="ml-4 inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900"
@@ -25,20 +28,20 @@ const MTDInfoModal = ({ isOpen, onClose }: MTDInfoModalProps) => {
         </div>
         <div className="space-y-4 text-sm text-gray-600">
           <p className="font-medium text-blue-600">
-            Important: Selecting this option does not affect your tax calculation in this calculator.
+            {t('modals.mtd.important')}
           </p>
           <p>
-            Monthly Tax Deduction (MTD/PCB) is relevant for your actual tax filing with LHDN:
+            {t('modals.mtd.body')}
           </p>
           <ul className="ml-4 list-disc space-y-2">
-            <li>Since 2014, if you have MTD and meet certain criteria, you can choose not to file a tax return</li>
-            <li>In this case, your MTD will be considered your final tax</li>
-            <li>However, if you want to claim additional reliefs, you must submit a tax return</li>
-            <li>Late submissions may incur penalties</li>
-            <li>LHDN can still raise additional assessments upon receiving your return</li>
+            <li>{t('modals.mtd.item1')}</li>
+            <li>{t('modals.mtd.item2')}</li>
+            <li>{t('modals.mtd.item3')}</li>
+            <li>{t('modals.mtd.item4')}</li>
+            <li>{t('modals.mtd.item5')}</li>
           </ul>
           <p className="mt-4 text-xs font-medium text-gray-500">
-            This calculator only estimates your total tax liability based on income and reliefs. Your actual tax payment will depend on your MTD amounts and LHDN's assessment.
+            {t('modals.mtd.note')}
           </p>
         </div>
       </div>

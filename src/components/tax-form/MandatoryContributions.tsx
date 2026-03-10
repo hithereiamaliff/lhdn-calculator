@@ -1,4 +1,5 @@
 type ChangeHandler = (e: { target: HTMLInputElement }) => void;
+import { useTranslation } from 'react-i18next';
 import { TaxInput } from '../../types/tax';
 import { reliefLimits } from '../../utils/taxCalculator';
 
@@ -33,13 +34,15 @@ const MandatoryContributions = ({
   formatCurrency,
   reliefLimits
 }: MandatoryContributionsProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-700">Mandatory Contributions</h3>
+      <h3 className="text-lg font-semibold text-gray-700">{t('contributions.title')}</h3>
       <div className="rounded-lg bg-gray-50 p-4 space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-600">
-            EPF Mandatory/Basic Voluntary Contribution
+            {t('contributions.epfMandatory')}
           </label>
           <input
             type="number"
@@ -50,11 +53,11 @@ const MandatoryContributions = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.epfMandatoryContribution, reliefLimits.epf.mandatory) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.epf.mandatory)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.epf.mandatory) })}</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-600">
-            EPF Additional Voluntary Contribution
+            {t('contributions.epfVoluntary')}
           </label>
           <input
             type="number"
@@ -65,11 +68,11 @@ const MandatoryContributions = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.epfVoluntaryContribution, reliefLimits.epf.voluntary) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.epf.voluntary)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.epf.voluntary) })}</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-600">
-            SOCSO Contribution
+            {t('contributions.socso')}
           </label>
           <input
             type="number"
@@ -80,15 +83,15 @@ const MandatoryContributions = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.socsoContribution, reliefLimits.socso) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.socso)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.socso) })}</p>
         </div>
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-700 mt-6">Insurance</h3>
+      <h3 className="text-lg font-semibold text-gray-700 mt-6">{t('contributions.insurance')}</h3>
       <div className="rounded-lg bg-gray-50 p-4 space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-600">
-            Life Insurance / Family Takaful Premium
+            {t('contributions.lifeInsurance')}
           </label>
           <input
             type="number"
@@ -99,11 +102,11 @@ const MandatoryContributions = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.lifeInsurance, reliefLimits.epf.voluntary) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Shares RM{reliefLimits.epf.voluntary.toLocaleString()} sub-limit with EPF Additional Voluntary Contribution</p>
+          <p className="mt-1 text-sm text-gray-500">{t('contributions.lifeInsuranceHelper', { amount: reliefLimits.epf.voluntary.toLocaleString() })}</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-600">
-            Education & Medical Insurance
+            {t('contributions.educationInsurance')}
           </label>
           <input
             type="number"
@@ -114,7 +117,7 @@ const MandatoryContributions = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.educationInsurance, reliefLimits.educationInsurance) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.educationInsurance)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.educationInsurance) })}</p>
         </div>
       </div>
     </div>

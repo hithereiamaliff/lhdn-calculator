@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import MTDInfoModal from '../modals/MTDInfoModal';
 import { TaxInput } from '../../types/tax';
 import { reliefLimits } from '../../utils/taxCalculator';
@@ -11,10 +12,11 @@ interface TaxPayerInfoProps {
 }
 
 const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange }: TaxPayerInfoProps) => {
+  const { t } = useTranslation();
   const [showMTDInfo, setShowMTDInfo] = useState(false);
   const handleAssessmentChange = (e: { target: { value: string } }) => {
     const newAssessmentType = e.target.value;
-    
+
     // Set isMarried based on assessment type
     onChange({
       target: {
@@ -36,7 +38,7 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
         }
       });
     }
-    
+
     // Update assessment type
     onChange({
       target: {
@@ -53,11 +55,11 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
     <>
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-gray-700">Basic Information</h3>
+        <h3 className="text-lg font-semibold text-gray-700">{t('taxpayer.basicInfo')}</h3>
         <div className="mt-4 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-600">
-              Annual Income
+              {t('taxpayer.annualIncome')}
             </label>
             <input
               type="number"
@@ -71,7 +73,7 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-600">
-              Type of Assessment
+              {t('taxpayer.assessmentType')}
             </label>
             <select
               name="assessmentType"
@@ -79,33 +81,33 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
               onChange={handleAssessmentChange}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
-              <option value="single">Individual Assessment</option>
-              <option value="separate">Separate Assessment (Taksiran Berasingan)</option>
-              <option value="joint">Joint Assessment (Taksiran Bersama)</option>
+              <option value="single">{t('taxpayer.single')}</option>
+              <option value="separate">{t('taxpayer.separate')}</option>
+              <option value="joint">{t('taxpayer.joint')}</option>
             </select>
             {showChildThresholdNote && (
               <p className="mt-1 text-sm text-gray-500">
-                Different tax thresholds apply based on number of children
+                {t('taxpayer.childThresholdNote')}
               </p>
             )}
           </div>
           {input.annualIncome > 0 && (
             <div className={`rounded-lg p-4 ${canSkipReliefSteps ? 'bg-green-50' : 'bg-blue-50'}`}>
               <p className={`text-sm ${canSkipReliefSteps ? 'text-green-800' : 'text-blue-800'}`}>
-                Non-taxable threshold for this assessment: RM{nonTaxableThreshold.toLocaleString()}
+                {t('taxpayer.nonTaxableThreshold', { amount: nonTaxableThreshold.toLocaleString() })}
               </p>
               {canSkipReliefSteps && (
                 <p className="mt-1 text-sm text-green-700">
-                  Your current income is at or below this threshold, so you can skip the remaining relief pages and go straight to the result.
+                  {t('taxpayer.belowThreshold')}
                 </p>
               )}
             </div>
           )}
           <div className="space-y-4 rounded-lg bg-gray-50 p-4">
-            <h4 className="text-sm font-medium text-gray-700">Children Information</h4>
+            <h4 className="text-sm font-medium text-gray-700">{t('taxpayer.childrenInfo')}</h4>
             <div>
               <label className="block text-sm font-medium text-gray-600">
-                Number of Children Below 18
+                {t('taxpayer.childrenBelow18')}
               </label>
               <input
                 type="number"
@@ -118,7 +120,7 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600">
-                Number of Children 18+ in Pre-U / A-Level / Certificate / Matriculation
+                {t('taxpayer.childrenAbove18PreU')}
               </label>
               <input
                 type="number"
@@ -128,11 +130,11 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
                 min="0"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
-              <p className="mt-1 text-sm text-gray-500">RM{reliefLimits.childAbove18Education.toLocaleString()} relief per eligible child</p>
+              <p className="mt-1 text-sm text-gray-500">{t('common.reliefPerChild', { amount: `RM${reliefLimits.childAbove18Education.toLocaleString()}` })}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600">
-                Number of Children 18+ in Diploma / Degree / Higher Education
+                {t('taxpayer.childrenAbove18Higher')}
               </label>
               <input
                 type="number"
@@ -142,11 +144,11 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
                 min="0"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
-              <p className="mt-1 text-sm text-gray-500">RM{reliefLimits.childEducation.toLocaleString()} relief per eligible child</p>
+              <p className="mt-1 text-sm text-gray-500">{t('common.reliefPerChild', { amount: `RM${reliefLimits.childEducation.toLocaleString()}` })}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600">
-                Number of Disabled Children
+                {t('taxpayer.disabledChildren')}
               </label>
               <input
                 type="number"
@@ -156,11 +158,11 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
                 min="0"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
-              <p className="mt-1 text-sm text-gray-500">Additional RM{reliefLimits.disabledChild.toLocaleString()} relief per disabled child</p>
+              <p className="mt-1 text-sm text-gray-500">{t('common.additionalReliefPerChild', { amount: `RM${reliefLimits.disabledChild.toLocaleString()}` })}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600">
-                Number of Disabled Children (18+ in Education)
+                {t('taxpayer.disabledChildrenStudying')}
               </label>
               <input
                 type="number"
@@ -170,7 +172,7 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
                 min="0"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
-              <p className="mt-1 text-sm text-gray-500">Additional RM{reliefLimits.disabledChildStudying.toLocaleString()} relief per disabled child studying (diploma or above)</p>
+              <p className="mt-1 text-sm text-gray-500">{t('common.additionalReliefPerChildStudying', { amount: `RM${reliefLimits.disabledChildStudying.toLocaleString()}` })}</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -185,7 +187,7 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
                 }}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-600">Has Monthly Tax Deduction (PCB/MTD)</span>
+              <span className="text-sm text-gray-600">{t('taxpayer.hasMTD')}</span>
               <button
                 type="button"
                 onClick={() => setShowMTDInfo(true)}
@@ -207,7 +209,7 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
                 onChange={onChange}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-600">Disabled Individual</span>
+              <span className="text-sm text-gray-600">{t('taxpayer.isDisabled')}</span>
             </label>
           </div>
           {(input.assessmentType === 'separate' || input.assessmentType === 'joint') && (
@@ -220,22 +222,22 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
                   onChange={onChange}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-600">Disabled Spouse</span>
+                <span className="text-sm text-gray-600">{t('taxpayer.hasDisabledSpouse')}</span>
               </label>
             </div>
           )}
         </div>
       </div>
       <div className="rounded-lg bg-blue-50 p-4">
-        <h4 className="text-sm font-medium text-blue-800">Automatic Reliefs Applied:</h4>
+        <h4 className="text-sm font-medium text-blue-800">{t('taxpayer.autoReliefs')}</h4>
         <ul className="mt-2 list-inside list-disc text-sm text-blue-700">
-          <li>Individual Relief: RM{reliefLimits.individual.toLocaleString()}</li>
-          {input.isDisabled && <li>Disabled Individual Relief: RM{reliefLimits.disabled.toLocaleString()}</li>}
+          <li>{t('taxpayer.individualRelief', { amount: reliefLimits.individual.toLocaleString() })}</li>
+          {input.isDisabled && <li>{t('taxpayer.disabledRelief', { amount: reliefLimits.disabled.toLocaleString() })}</li>}
           {(input.assessmentType === 'separate' || input.assessmentType === 'joint') && (
             <li>
               {input.hasDisabledSpouse
-                ? `Disabled Spouse Relief: RM${reliefLimits.disabledSpouse.toLocaleString()}`
-                : `Spouse Relief: RM${reliefLimits.spouse.toLocaleString()}`}
+                ? t('taxpayer.disabledSpouseRelief', { amount: reliefLimits.disabledSpouse.toLocaleString() })
+                : t('taxpayer.spouseRelief', { amount: reliefLimits.spouse.toLocaleString() })}
             </li>
           )}
         </ul>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { TaxResult } from '../../types/tax';
 
 interface TaxSummaryProps {
@@ -6,67 +7,66 @@ interface TaxSummaryProps {
 }
 
 const TaxSummary = ({ result, formatCurrency }: TaxSummaryProps) => {
+  const { t } = useTranslation();
+
   if (!result) return null;
 
   const getThresholdMessage = () => {
     const { assessmentType, numChildren } = result;
-    
+
     if (!assessmentType || assessmentType === 'single') {
-      return 'You won\'t be taxed if your annual employment income is';
+      return t('summary.threshold.single', { amount: formatCurrency(result.nonTaxableThreshold) });
     }
 
     const assessmentText = assessmentType === 'joint'
-      ? 'Joint Assessment (Taksiran Bersama)'
-      : 'Separate Assessment (Taksiran Berasingan)';
-    let childrenText;
-    
-    if (numChildren === 0) {
-      childrenText = 'no children';
-    } else if (numChildren === 1) {
-      childrenText = 'one child';
-    } else {
-      childrenText = 'two or more children';
-    }
+      ? t('taxpayer.joint')
+      : t('taxpayer.separate');
 
-    return `Under ${assessmentText} with ${childrenText}, you won't be taxed if your annual employment income is`;
+    if (numChildren === 0) {
+      return t('summary.threshold.withChildren_zero', { assessment: assessmentText, amount: formatCurrency(result.nonTaxableThreshold) });
+    } else if (numChildren === 1) {
+      return t('summary.threshold.withChildren_one', { assessment: assessmentText, amount: formatCurrency(result.nonTaxableThreshold) });
+    } else {
+      return t('summary.threshold.withChildren_other', { assessment: assessmentText, amount: formatCurrency(result.nonTaxableThreshold) });
+    }
   };
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-700">Tax Summary</h3>
+      <h3 className="text-lg font-semibold text-gray-700">{t('summary.title')}</h3>
       <div className="rounded-lg bg-gray-50 p-4">
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-gray-600">Total Income</span>
+            <span className="text-gray-600">{t('summary.totalIncome')}</span>
             <span className="font-medium">{formatCurrency(result.totalIncome)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Total Relief</span>
+            <span className="text-gray-600">{t('summary.totalRelief')}</span>
             <span className="font-medium">{formatCurrency(result.totalRelief)}</span>
           </div>
           {result.donationDeduction > 0 && (
             <div className="flex justify-between">
-              <span className="text-gray-600">Donation Deduction</span>
+              <span className="text-gray-600">{t('summary.donationDeduction')}</span>
               <span className="font-medium">{formatCurrency(result.donationDeduction)}</span>
             </div>
           )}
           <div className="flex justify-between">
-            <span className="text-gray-600">Chargeable Income</span>
+            <span className="text-gray-600">{t('summary.chargeableIncome')}</span>
             <span className="font-medium">{formatCurrency(result.taxableIncome)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Tax Before Rebates</span>
+            <span className="text-gray-600">{t('summary.taxBeforeRebates')}</span>
             <span className="font-medium">{formatCurrency(result.totalTax)}</span>
           </div>
           {(result.individualRebate > 0 || result.spouseRebate > 0 || result.zakatRebate > 0) && (
             <div className="flex justify-between text-green-600">
-              <span>Total Rebates</span>
+              <span>{t('summary.totalRebates')}</span>
               <span>-{formatCurrency(result.individualRebate + result.spouseRebate + result.zakatRebate)}</span>
             </div>
           )}
           <div className="border-t border-gray-200 pt-2">
             <div className="flex justify-between">
-              <span className="font-medium text-gray-700">Tax Payable</span>
+              <span className="font-medium text-gray-700">{t('summary.taxPayable')}</span>
               <span className="font-semibold text-blue-600">{formatCurrency(result.taxPayable)}</span>
             </div>
           </div>
@@ -75,7 +75,7 @@ const TaxSummary = ({ result, formatCurrency }: TaxSummaryProps) => {
       {result.nonTaxableThreshold > 0 && (
         <div className="rounded-lg bg-yellow-50 p-4">
           <p className="text-sm text-yellow-800">
-            {getThresholdMessage()} {formatCurrency(result.nonTaxableThreshold)} and below.
+            {getThresholdMessage()}
           </p>
         </div>
       )}

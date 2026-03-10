@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, ExternalLink, Github } from 'lucide-react';
 import URLVerifyModal from './URLVerifyModal';
 type InputChangeEvent = { target: { name: string; value: string; type: string; checked?: boolean } };
 
 // Import the actual components and utilities
-import { TaxInput, TaxResult, initialState as initialTaxState } from '../types/tax'; 
-import { calculateTax, getNonTaxableThreshold, reliefLimits } from '../utils/taxCalculator'; 
-import { formatCurrency } from '../utils/formatter'; 
+import { TaxInput, TaxResult, initialState as initialTaxState } from '../types/tax';
+import { calculateTax, getNonTaxableThreshold, reliefLimits } from '../utils/taxCalculator';
+import { formatCurrency } from '../utils/formatter';
 import TaxPayerInfo from './tax-form/TaxPayerInfo';
 import Disclaimer from './tax-form/Disclaimer';
 import MandatoryContributions from './tax-form/MandatoryContributions';
@@ -23,10 +24,11 @@ interface ExternalLinkInfo {
   siteName: string;
 }
 
-function TaxForm() { 
-  const [input, setInput] = useState<TaxInput>(initialTaxState); 
-  const [result, setResult] = useState<TaxResult | null>(null); 
-  const [currentStep, setCurrentStep] = useState(1); 
+function TaxForm() {
+  const { t } = useTranslation();
+  const [input, setInput] = useState<TaxInput>(initialTaxState);
+  const [result, setResult] = useState<TaxResult | null>(null);
+  const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<Partial<Record<keyof TaxInput, string>>>({});
   const [isCalculating, setIsCalculating] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -39,19 +41,19 @@ function TaxForm() {
     e.preventDefault();
     setExternalLink({ url, siteName });
     setModalOpen(true);
-  }; 
+  };
 
-  const handleInputChange = (e: InputChangeEvent) => { 
+  const handleInputChange = (e: InputChangeEvent) => {
     const { name, value, type, checked } = e.target;
     // Parse value while maintaining exact precision
     const parsedValue = value === '' ? 0 : Number(value);
 
-    setInput((prev: TaxInput) => ({ 
+    setInput((prev: TaxInput) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : isNaN(parsedValue) ? value : parsedValue
     }));
     if (errors[name as keyof TaxInput]) {
-        setErrors((prev: Partial<Record<keyof TaxInput, string>>) => { 
+        setErrors((prev: Partial<Record<keyof TaxInput, string>>) => {
           const updatedErrors = { ...prev };
           delete updatedErrors[name as keyof TaxInput];
           return updatedErrors;
@@ -120,17 +122,17 @@ function TaxForm() {
               onChange={handleInputChange}
             />
           </>
-        ); 
+        );
       case 2:
-        return <MandatoryContributions input={input} onChange={handleInputChange} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} reliefLimits={reliefLimits} />; 
-      case 3: 
-        return <TaxReliefs input={input} onChange={handleInputChange} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} />; 
+        return <MandatoryContributions input={input} onChange={handleInputChange} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} reliefLimits={reliefLimits} />;
+      case 3:
+        return <TaxReliefs input={input} onChange={handleInputChange} isExceedingLimit={isExceedingLimit} formatCurrency={formatCurrency} />;
       case 4:
         if (isCalculating) {
           return (
             <div className="flex flex-col items-center justify-center p-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-              <p className="text-gray-600">Calculating your tax...</p>
+              <p className="text-gray-600">{t('common.calculating')}</p>
             </div>
           );
         }
@@ -140,14 +142,14 @@ function TaxForm() {
             {result && (
               <div className="space-y-6">
                 <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Tax Calculation Results</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">{t('summary.resultsTitle')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-gray-50 rounded">
-                      <p className="text-sm text-gray-600">Chargeable Income</p>
+                      <p className="text-sm text-gray-600">{t('summary.chargeableIncome')}</p>
                       <p className="text-lg font-semibold">{formatCurrency(result.taxableIncome)}</p>
                     </div>
                     <div className="p-4 bg-blue-50 rounded">
-                      <p className="text-sm text-blue-600">Tax Payable</p>
+                      <p className="text-sm text-blue-600">{t('summary.taxPayable')}</p>
                       <p className="text-lg font-semibold">{formatCurrency(result.taxPayable)}</p>
                     </div>
                   </div>
@@ -158,7 +160,7 @@ function TaxForm() {
                     onClick={handleRestart}
                     className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
                   >
-                    Start New Calculation
+                    {t('nav.startNew')}
                   </button>
                 </div>
               </div>
@@ -182,7 +184,7 @@ function TaxForm() {
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Previous
+              {t('nav.previous')}
             </button>
           )}
           {currentStep < 4 ? (
@@ -196,7 +198,7 @@ function TaxForm() {
                   : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
               }`}
             >
-              {currentStep === 1 && canSkipReliefSteps ? 'See Result' : 'Next'}
+              {currentStep === 1 && canSkipReliefSteps ? t('nav.seeResult') : currentStep === 3 ? t('nav.calculate') : t('nav.next')}
               <ArrowRight className="w-5 h-5 ml-2" />
             </button>
           ) : null}
@@ -206,20 +208,20 @@ function TaxForm() {
       {/* Source reference and credits */}
       <div className="text-center text-sm text-gray-500 border-t pt-8 space-y-4">
         <div>
-          <span>Tax information from: </span>
+          <span>{t('footer.taxInfoFrom')}</span>
           <a
             href="#"
-            onClick={(e) => handleExternalLinkClick(e, 'https://www.hasil.gov.my/en/individual/introduction-individual-income-tax/', 'LHDN Official Website')}
+            onClick={(e) => handleExternalLinkClick(e, 'https://www.hasil.gov.my/en/individual/introduction-individual-income-tax/', t('footer.lhdnWebsite'))}
             className="inline-flex items-center text-blue-600 hover:text-blue-800 cursor-pointer"
           >
-            LHDN Official Website
+            {t('footer.lhdnWebsite')}
             <ExternalLink className="w-4 h-4 ml-1" />
           </a>
         </div>
         <div className="flex items-center justify-center flex-wrap gap-1">
-          <span>Made with</span>
+          <span>{t('footer.madeWith')}</span>
           <span className="text-red-500">❤️</span>
-          <span>by</span>
+          <span>{t('footer.by')}</span>
           <a
             href="#"
             onClick={(e) => handleExternalLinkClick(e, 'https://techmavie.digital', 'TechMavie Digital')}
@@ -229,13 +231,13 @@ function TaxForm() {
           </a>
           <span className="mx-1">|</span>
           <Github className="w-4 h-4 inline" />
-          <span className="ml-1">View</span>{' '}
+          <span className="ml-1">{t('footer.viewSource')}</span>{' '}
           <a
             href="#"
             onClick={(e) => handleExternalLinkClick(e, 'https://github.com/hithereiamaliff/lhdn-calculator', 'GitHub Repository')}
             className="text-blue-600 hover:text-blue-800 cursor-pointer"
           >
-            source code on GitHub
+            {t('footer.sourceCode')}
           </a>
         </div>
       </div>

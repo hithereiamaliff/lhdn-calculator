@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TaxInput } from '../../types/tax';
 import { reliefLimits } from '../../utils/taxCalculator';
 
@@ -34,20 +35,20 @@ const TaxReliefs = ({
   isExceedingLimit,
   formatCurrency,
 }: TaxReliefsProps) => {
+  const { t } = useTranslation();
   const housingLoanLimit = input.housingLoanTier === 'tier1' ? reliefLimits.housingLoanInterest.tier1
     : input.housingLoanTier === 'tier2' ? reliefLimits.housingLoanInterest.tier2
     : 0;
-  const donationLimit = input.annualIncome > 0 ? input.annualIncome * 0.1 : undefined;
 
   return (
     <div className="space-y-6">
       {/* Medical Expenses */}
       <div className="space-y-4 border-b pb-4">
-        <h4 className="text-md font-medium text-gray-700">Medical Expenses</h4>
+        <h4 className="text-md font-medium text-gray-700">{t('reliefs.medicalExpenses')}</h4>
 
         <div>
           <label htmlFor="medicalTreatment" className="block text-sm font-medium text-gray-700">
-            Serious Diseases & Fertility Treatment (RM)
+            {t('reliefs.seriousDiseases')}
           </label>
           <input
             type="number"
@@ -59,12 +60,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.medicalTreatment, reliefLimits.medicalTreatment.total) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Combined limit of {formatCurrency(reliefLimits.medicalTreatment.total)} (includes vaccination & dental below)</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.seriousDiseasesHelper', { amount: formatCurrency(reliefLimits.medicalTreatment.total) })}</p>
         </div>
 
         <div>
           <label htmlFor="vaccinationCost" className="block text-sm font-medium text-gray-700">
-            Vaccination Costs (RM)
+            {t('reliefs.vaccination')}
           </label>
           <input
             type="number"
@@ -76,12 +77,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.vaccinationCost, reliefLimits.medicalTreatment.vaccination) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Sub-limit {formatCurrency(reliefLimits.medicalTreatment.vaccination)} within medical expenses</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.vaccinationHelper', { amount: formatCurrency(reliefLimits.medicalTreatment.vaccination) })}</p>
         </div>
 
         <div>
           <label htmlFor="dentalTreatment" className="block text-sm font-medium text-gray-700">
-            Dental Treatment (RM)
+            {t('reliefs.dental')}
           </label>
           <input
             type="number"
@@ -93,12 +94,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.dentalTreatment, reliefLimits.medicalTreatment.dental) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Sub-limit {formatCurrency(reliefLimits.medicalTreatment.dental)} within medical expenses</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.dentalHelper', { amount: formatCurrency(reliefLimits.medicalTreatment.dental) })}</p>
         </div>
 
         <div>
           <label htmlFor="medicalCheckup" className="block text-sm font-medium text-gray-700">
-            Medical Check-up, COVID-19 Testing & Self-Health Monitoring (RM)
+            {t('reliefs.medicalCheckup')}
           </label>
           <input
             type="number"
@@ -110,12 +111,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit((input.medicalCheckup || 0) + (input.mentalHealth || 0), reliefLimits.medicalCheckupAndMental) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Shares combined {formatCurrency(reliefLimits.medicalCheckupAndMental)} limit with mental health below</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.medicalCheckupHelper', { amount: formatCurrency(reliefLimits.medicalCheckupAndMental) })}</p>
         </div>
 
         <div>
           <label htmlFor="mentalHealth" className="block text-sm font-medium text-gray-700">
-            Mental Health Examination & Consultation (RM)
+            {t('reliefs.mentalHealth')}
           </label>
           <input
             type="number"
@@ -127,12 +128,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit((input.medicalCheckup || 0) + (input.mentalHealth || 0), reliefLimits.medicalCheckupAndMental) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Shares combined {formatCurrency(reliefLimits.medicalCheckupAndMental)} limit with medical check-up above</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.mentalHealthHelper', { amount: formatCurrency(reliefLimits.medicalCheckupAndMental) })}</p>
         </div>
 
         <div>
           <label htmlFor="basicSupporting" className="block text-sm font-medium text-gray-700">
-            Basic Supporting Equipment for Disabled Self/Spouse/Child/Parent (RM)
+            {t('reliefs.basicSupporting')}
           </label>
           <input
             type="number"
@@ -144,12 +145,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.basicSupporting, reliefLimits.basicSupporting) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.basicSupporting)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.basicSupporting) })}</p>
         </div>
 
         <div>
           <label htmlFor="parentsMedical" className="block text-sm font-medium text-gray-700">
-            Parents/Grandparents Medical Care (RM)
+            {t('reliefs.parentsMedical')}
           </label>
           <input
             type="number"
@@ -161,12 +162,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.parentsMedical, reliefLimits.parentsMedical.total) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Combined limit of {formatCurrency(reliefLimits.parentsMedical.total)} (includes examination below)</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.parentsMedicalHelper', { amount: formatCurrency(reliefLimits.parentsMedical.total) })}</p>
         </div>
 
         <div>
           <label htmlFor="parentsExamination" className="block text-sm font-medium text-gray-700">
-            Parents/Grandparents Medical Examination (RM)
+            {t('reliefs.parentsExamination')}
           </label>
           <input
             type="number"
@@ -178,17 +179,17 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.parentsExamination, reliefLimits.parentsMedical.examination) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Sub-limit {formatCurrency(reliefLimits.parentsMedical.examination)} within parents medical</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.parentsExaminationHelper', { amount: formatCurrency(reliefLimits.parentsMedical.examination) })}</p>
         </div>
       </div>
 
       {/* Savings & Retirement */}
       <div className="space-y-4 border-b pb-4">
-        <h4 className="text-md font-medium text-gray-700">Savings & Retirement</h4>
+        <h4 className="text-md font-medium text-gray-700">{t('reliefs.savingsRetirement')}</h4>
 
         <div>
           <label htmlFor="sspnDeposit" className="block text-sm font-medium text-gray-700">
-            SSPN Net Deposit (RM)
+            {t('reliefs.sspn')}
           </label>
           <input
             type="number"
@@ -200,12 +201,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.sspnDeposit, reliefLimits.sspn) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Net deposit (Deposit - Withdrawal) limited to {formatCurrency(reliefLimits.sspn)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.sspnHelper', { amount: formatCurrency(reliefLimits.sspn) })}</p>
         </div>
 
         <div>
           <label htmlFor="deferredAnnuityPrs" className="block text-sm font-medium text-gray-700">
-            Deferred Annuity and Private Retirement Scheme (PRS) (RM)
+            {t('reliefs.deferredAnnuity')}
           </label>
           <input
             type="number"
@@ -217,17 +218,17 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.deferredAnnuityPrs, reliefLimits.deferredAnnuityPrs) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.deferredAnnuityPrs)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.deferredAnnuityPrs) })}</p>
         </div>
       </div>
 
       {/* Lifestyle */}
       <div className="space-y-4 border-b pb-4">
-        <h4 className="text-md font-medium text-gray-700">Lifestyle</h4>
+        <h4 className="text-md font-medium text-gray-700">{t('reliefs.lifestyle')}</h4>
 
         <div>
           <label htmlFor="lifestyle" className="block text-sm font-medium text-gray-700">
-            Books, Computer, Internet, Self-Development (RM)
+            {t('reliefs.lifestyleBooks')}
           </label>
           <input
             type="number"
@@ -239,12 +240,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.lifestyle, reliefLimits.lifestyle) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.lifestyle)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.lifestyle) })}</p>
         </div>
 
         <div>
           <label htmlFor="lifestyleSports" className="block text-sm font-medium text-gray-700">
-            Sports Equipment & Gym Membership (RM)
+            {t('reliefs.lifestyleSports')}
           </label>
           <input
             type="number"
@@ -256,12 +257,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.lifestyleSports, reliefLimits.lifestyleSports) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.lifestyleSports)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.lifestyleSports) })}</p>
         </div>
 
         <div>
           <label htmlFor="evChargingFacilities" className="block text-sm font-medium text-gray-700">
-            EV Charging Facilities & Domestic Food Waste Composting Machine (RM)
+            {t('reliefs.evCharging')}
           </label>
           <input
             type="number"
@@ -273,17 +274,17 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.evChargingFacilities, reliefLimits.evChargingFacilities) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.evChargingFacilities)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.evChargingFacilities) })}</p>
         </div>
       </div>
 
       {/* Education */}
       <div className="space-y-4 border-b pb-4">
-        <h4 className="text-md font-medium text-gray-700">Education</h4>
+        <h4 className="text-md font-medium text-gray-700">{t('reliefs.education')}</h4>
 
         <div>
           <label htmlFor="educationFees" className="block text-sm font-medium text-gray-700">
-            Higher Education Fees (RM)
+            {t('reliefs.educationFees')}
           </label>
           <input
             type="number"
@@ -295,12 +296,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.educationFees, reliefLimits.educationFees.total) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Combined limit of {formatCurrency(reliefLimits.educationFees.total)} (includes upskilling below)</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.educationFeesHelper', { amount: formatCurrency(reliefLimits.educationFees.total) })}</p>
         </div>
 
         <div>
           <label htmlFor="upskilling" className="block text-sm font-medium text-gray-700">
-            Upskilling & Self-Enhancement Courses (RM)
+            {t('reliefs.upskilling')}
           </label>
           <input
             type="number"
@@ -312,17 +313,17 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.upskilling, reliefLimits.educationFees.upskilling) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Sub-limit {formatCurrency(reliefLimits.educationFees.upskilling)} within education fees</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.upskillingHelper', { amount: formatCurrency(reliefLimits.educationFees.upskilling) })}</p>
         </div>
       </div>
 
       {/* Child Care */}
       <div className="space-y-4 border-b pb-4">
-        <h4 className="text-md font-medium text-gray-700">Child Care</h4>
+        <h4 className="text-md font-medium text-gray-700">{t('reliefs.childCare')}</h4>
 
         <div>
           <label htmlFor="childCare" className="block text-sm font-medium text-gray-700">
-            Child Care Fees (Children under 6) (RM)
+            {t('reliefs.childCareFees')}
           </label>
           <input
             type="number"
@@ -334,12 +335,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.childCare, reliefLimits.childCare) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.childCare)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.childCare) })}</p>
         </div>
 
         <div>
           <label htmlFor="breastfeedingEquipment" className="block text-sm font-medium text-gray-700">
-            Breastfeeding Equipment (Once per 2 years) (RM)
+            {t('reliefs.breastfeeding')}
           </label>
           <input
             type="number"
@@ -351,12 +352,12 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.breastfeedingEquipment, reliefLimits.breastfeedingEquipment) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.breastfeedingEquipment)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.breastfeedingEquipment) })}</p>
         </div>
 
         <div>
           <label htmlFor="childDisabilitySupport" className="block text-sm font-medium text-gray-700">
-            Child Disability Support & Rehabilitation (RM)
+            {t('reliefs.childDisability')}
           </label>
           <input
             type="number"
@@ -368,18 +369,18 @@ const TaxReliefs = ({
             step="0.01"
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.childDisabilitySupport, reliefLimits.childDisabilitySupport) ? 'border-red-300' : 'border-gray-300'}`}
           />
-          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.childDisabilitySupport)}</p>
+          <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(reliefLimits.childDisabilitySupport) })}</p>
         </div>
       </div>
 
       {/* Housing Loan Interest (NEW YA 2025) */}
       <div className="space-y-4 border-b pb-4">
-        <h4 className="text-md font-medium text-gray-700">Housing Loan Interest (First Home)</h4>
-        <p className="text-sm text-gray-500">For S&P agreements from 1 Jan 2025 to 31 Dec 2027</p>
+        <h4 className="text-md font-medium text-gray-700">{t('reliefs.housingLoan')}</h4>
+        <p className="text-sm text-gray-500">{t('reliefs.housingLoanNote')}</p>
 
         <div>
           <label htmlFor="housingLoanTier" className="block text-sm font-medium text-gray-700">
-            House Price Tier
+            {t('reliefs.housePriceTier')}
           </label>
           <select
             name="housingLoanTier"
@@ -388,16 +389,16 @@ const TaxReliefs = ({
             onChange={onChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm focus:border-blue-500 focus:ring-blue-500"
           >
-            <option value="none">Not applicable</option>
-            <option value="tier1">House price up to RM500,000 (relief up to RM7,000)</option>
-            <option value="tier2">House price RM500,001 - RM750,000 (relief up to RM5,000)</option>
+            <option value="none">{t('reliefs.tierNone')}</option>
+            <option value="tier1">{t('reliefs.tier1')}</option>
+            <option value="tier2">{t('reliefs.tier2')}</option>
           </select>
         </div>
 
         {input.housingLoanTier !== 'none' && (
           <div>
             <label htmlFor="housingLoanInterest" className="block text-sm font-medium text-gray-700">
-              Housing Loan Interest Paid (RM)
+              {t('reliefs.housingLoanInterest')}
             </label>
             <input
               type="number"
@@ -409,18 +410,18 @@ const TaxReliefs = ({
               step="0.01"
               className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.housingLoanInterest, housingLoanLimit) ? 'border-red-300' : 'border-gray-300'}`}
             />
-            <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(housingLoanLimit)}</p>
+            <p className="mt-1 text-sm text-gray-500">{t('common.limitedTo', { amount: formatCurrency(housingLoanLimit) })}</p>
           </div>
         )}
       </div>
 
       {/* Zakat & Donations */}
       <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-700">Zakat & Donations</h4>
+        <h4 className="text-md font-medium text-gray-700">{t('reliefs.zakatDonations')}</h4>
 
         <div>
           <label htmlFor="zakat" className="block text-sm font-medium text-gray-700">
-            Zakat Payment (RM)
+            {t('reliefs.zakat')}
           </label>
           <input
             type="number"
@@ -432,12 +433,12 @@ const TaxReliefs = ({
             step="0.01"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
           />
-          <p className="mt-1 text-sm text-gray-500">Applied as a tax rebate, capped by the tax charged</p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.zakatHelper')}</p>
         </div>
 
         <div>
           <label htmlFor="donations" className="block text-sm font-medium text-gray-700">
-            Approved Donations to Institutions / Organisations (RM)
+            {t('reliefs.donations')}
           </label>
           <input
             type="number"
@@ -447,12 +448,9 @@ const TaxReliefs = ({
             onChange={onChange as (e: ChangeEvent<HTMLInputElement>) => void}
             min="0"
             step="0.01"
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${donationLimit !== undefined && isExceedingLimit(input.donations, donationLimit) ? 'border-red-300' : 'border-gray-300'}`}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
           />
-          <p className="mt-1 text-sm text-gray-500">
-            Deduction capped at 10% of aggregate income in this calculator
-            {donationLimit !== undefined ? ` (${formatCurrency(donationLimit)})` : ''}
-          </p>
+          <p className="mt-1 text-sm text-gray-500">{t('reliefs.donationsHelper')}</p>
         </div>
       </div>
     </div>
@@ -460,4 +458,3 @@ const TaxReliefs = ({
 };
 
 export default TaxReliefs;
-
