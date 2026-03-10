@@ -1,12 +1,3 @@
-/// <reference types="react" />
-
-declare module 'react' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface HTMLAttributes<T> {
-    className?: string;
-  }
-}
-
 declare module '*.css' {
   const content: { [className: string]: string };
   export default content;

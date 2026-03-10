@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MTDInfoModal from '../modals/MTDInfoModal';
 import { TaxInput } from '../../types/tax';
@@ -14,6 +14,54 @@ interface TaxPayerInfoProps {
 const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange }: TaxPayerInfoProps) => {
   const { t } = useTranslation();
   const [showMTDInfo, setShowMTDInfo] = useState(false);
+  const hasAnyChildren = (input.numChildrenBelow18 || 0) > 0
+    || (input.numChildrenAbove18Education || 0) > 0
+    || (input.numChildrenAbove18HigherEducation || 0) > 0
+    || (input.numDisabledChildren || 0) > 0
+    || (input.numDisabledChildrenStudying || 0) > 0;
+  const [showChildren, setShowChildren] = useState(hasAnyChildren);
+  const autoSyncedChildrenVisibility = useRef(hasAnyChildren);
+
+  // Auto-open when saved child values exist, and auto-hide only if that visibility
+  // came from existing values rather than an explicit "Yes" choice by the user.
+  useEffect(() => {
+    if (hasAnyChildren) {
+      autoSyncedChildrenVisibility.current = true;
+      setShowChildren(true);
+      return;
+    }
+
+    if (autoSyncedChildrenVisibility.current) {
+      setShowChildren(false);
+      autoSyncedChildrenVisibility.current = false;
+    }
+  }, [hasAnyChildren]);
+
+  const handleNoChildren = () => {
+    autoSyncedChildrenVisibility.current = false;
+    setShowChildren(false);
+    // Reset all children fields
+    const childFields = ['numChildrenBelow18', 'numChildrenAbove18Education', 'numChildrenAbove18HigherEducation', 'numDisabledChildren', 'numDisabledChildrenStudying'];
+    childFields.forEach(field => {
+      onChange({ target: { name: field, value: '0', type: 'number' } });
+    });
+  };
+
+  const handleShowChildren = () => {
+    autoSyncedChildrenVisibility.current = false;
+    setShowChildren(true);
+  };
+
+  // Only allow positive integers for children inputs
+  const handleChildrenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    // Allow empty while editing, or positive integers only.
+    if (val === '' || /^[1-9]\d*$/.test(val)) {
+      autoSyncedChildrenVisibility.current = false;
+      onChange({ target: { name: e.target.name, value: val, type: 'number' } });
+    }
+  };
+
   const handleAssessmentChange = (e: { target: { value: string } }) => {
     const newAssessmentType = e.target.value;
 
@@ -105,75 +153,114 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
           )}
           <div className="space-y-4 rounded-lg bg-gray-50 p-4">
             <h4 className="text-sm font-medium text-gray-700">{t('taxpayer.childrenInfo')}</h4>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                {t('taxpayer.childrenBelow18')}
-              </label>
-              <input
-                type="number"
-                name="numChildrenBelow18"
-                value={input.numChildrenBelow18 || ''}
-                onChange={onChange}
-                min="0"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleShowChildren}
+                className={`flex-1 px-4 py-2 text-sm font-medium rounded-md border transition-colors ${
+                  showChildren
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {t('taxpayer.hasChildrenYes')}
+              </button>
+              <button
+                type="button"
+                onClick={handleNoChildren}
+                className={`flex-1 px-4 py-2 text-sm font-medium rounded-md border transition-colors ${
+                  !showChildren
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {t('taxpayer.hasChildrenNo')}
+              </button>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                {t('taxpayer.childrenAbove18PreU')}
-              </label>
-              <input
-                type="number"
-                name="numChildrenAbove18Education"
-                value={input.numChildrenAbove18Education || ''}
-                onChange={onChange}
-                min="0"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <p className="mt-1 text-sm text-gray-500">{t('common.reliefPerChild', { amount: `RM${reliefLimits.childAbove18Education.toLocaleString()}` })}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                {t('taxpayer.childrenAbove18Higher')}
-              </label>
-              <input
-                type="number"
-                name="numChildrenAbove18HigherEducation"
-                value={input.numChildrenAbove18HigherEducation || ''}
-                onChange={onChange}
-                min="0"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <p className="mt-1 text-sm text-gray-500">{t('common.reliefPerChild', { amount: `RM${reliefLimits.childEducation.toLocaleString()}` })}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                {t('taxpayer.disabledChildren')}
-              </label>
-              <input
-                type="number"
-                name="numDisabledChildren"
-                value={input.numDisabledChildren || ''}
-                onChange={onChange}
-                min="0"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <p className="mt-1 text-sm text-gray-500">{t('common.additionalReliefPerChild', { amount: `RM${reliefLimits.disabledChild.toLocaleString()}` })}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                {t('taxpayer.disabledChildrenStudying')}
-              </label>
-              <input
-                type="number"
-                name="numDisabledChildrenStudying"
-                value={input.numDisabledChildrenStudying || ''}
-                onChange={onChange}
-                min="0"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <p className="mt-1 text-sm text-gray-500">{t('common.additionalReliefPerChildStudying', { amount: `RM${reliefLimits.disabledChildStudying.toLocaleString()}` })}</p>
-            </div>
+            {showChildren && (
+              <div className="space-y-4 pt-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">
+                    {t('taxpayer.childrenBelow18')}
+                  </label>
+                  <input
+                    type="number"
+                    name="numChildrenBelow18"
+                    value={input.numChildrenBelow18 || ''}
+                    onChange={handleChildrenChange}
+                    inputMode="numeric"
+                    min="1"
+                    step="1"
+                    onKeyDown={(e) => { if (['e', 'E', '.', '-', '+'].includes(e.key)) e.preventDefault(); }}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">
+                    {t('taxpayer.childrenAbove18PreU')}
+                  </label>
+                  <input
+                    type="number"
+                    name="numChildrenAbove18Education"
+                    value={input.numChildrenAbove18Education || ''}
+                    onChange={handleChildrenChange}
+                    inputMode="numeric"
+                    min="1"
+                    step="1"
+                    onKeyDown={(e) => { if (['e', 'E', '.', '-', '+'].includes(e.key)) e.preventDefault(); }}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">
+                    {t('taxpayer.childrenAbove18Higher')}
+                  </label>
+                  <input
+                    type="number"
+                    name="numChildrenAbove18HigherEducation"
+                    value={input.numChildrenAbove18HigherEducation || ''}
+                    onChange={handleChildrenChange}
+                    inputMode="numeric"
+                    min="1"
+                    step="1"
+                    onKeyDown={(e) => { if (['e', 'E', '.', '-', '+'].includes(e.key)) e.preventDefault(); }}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">
+                    {t('taxpayer.disabledChildren')}
+                  </label>
+                  <input
+                    type="number"
+                    name="numDisabledChildren"
+                    value={input.numDisabledChildren || ''}
+                    onChange={handleChildrenChange}
+                    inputMode="numeric"
+                    min="1"
+                    step="1"
+                    onKeyDown={(e) => { if (['e', 'E', '.', '-', '+'].includes(e.key)) e.preventDefault(); }}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">
+                    {t('taxpayer.disabledChildrenStudying')}
+                  </label>
+                  <input
+                    type="number"
+                    name="numDisabledChildrenStudying"
+                    value={input.numDisabledChildrenStudying || ''}
+                    onChange={handleChildrenChange}
+                    inputMode="numeric"
+                    min="1"
+                    step="1"
+                    onKeyDown={(e) => { if (['e', 'E', '.', '-', '+'].includes(e.key)) e.preventDefault(); }}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <div className="space-y-2">
             <label className="flex items-center space-x-2">
@@ -239,6 +326,21 @@ const TaxPayerInfo = ({ input, nonTaxableThreshold, canSkipReliefSteps, onChange
                 ? t('taxpayer.disabledSpouseRelief', { amount: reliefLimits.disabledSpouse.toLocaleString() })
                 : t('taxpayer.spouseRelief', { amount: reliefLimits.spouse.toLocaleString() })}
             </li>
+          )}
+          {(input.numChildrenBelow18 || 0) > 0 && (
+            <li>{t('taxpayer.childBelow18Relief', { count: input.numChildrenBelow18, amount: (input.numChildrenBelow18 * reliefLimits.childBelow18).toLocaleString() })}</li>
+          )}
+          {(input.numChildrenAbove18Education || 0) > 0 && (
+            <li>{t('taxpayer.childAbove18PreURelief', { count: input.numChildrenAbove18Education, amount: (input.numChildrenAbove18Education * reliefLimits.childAbove18Education).toLocaleString() })}</li>
+          )}
+          {(input.numChildrenAbove18HigherEducation || 0) > 0 && (
+            <li>{t('taxpayer.childAbove18HigherRelief', { count: input.numChildrenAbove18HigherEducation, amount: (input.numChildrenAbove18HigherEducation * reliefLimits.childEducation).toLocaleString() })}</li>
+          )}
+          {(input.numDisabledChildren || 0) > 0 && (
+            <li>{t('taxpayer.disabledChildRelief', { count: input.numDisabledChildren, amount: (input.numDisabledChildren * reliefLimits.disabledChild).toLocaleString() })}</li>
+          )}
+          {(input.numDisabledChildrenStudying || 0) > 0 && (
+            <li>{t('taxpayer.disabledChildStudyingRelief', { count: input.numDisabledChildrenStudying, amount: (input.numDisabledChildrenStudying * reliefLimits.disabledChildStudying).toLocaleString() })}</li>
           )}
         </ul>
       </div>
