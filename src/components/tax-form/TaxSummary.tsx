@@ -15,7 +15,9 @@ const TaxSummary = ({ result, formatCurrency }: TaxSummaryProps) => {
       return 'You won\'t be taxed if your annual employment income is';
     }
 
-    const assessmentText = assessmentType === 'joint' ? 'Joint Assessment' : 'Separate Assessment';
+    const assessmentText = assessmentType === 'joint'
+      ? 'Joint Assessment (Taksiran Bersama)'
+      : 'Separate Assessment (Taksiran Berasingan)';
     let childrenText;
     
     if (numChildren === 0) {
@@ -42,20 +44,30 @@ const TaxSummary = ({ result, formatCurrency }: TaxSummaryProps) => {
             <span className="text-gray-600">Total Relief</span>
             <span className="font-medium">{formatCurrency(result.totalRelief)}</span>
           </div>
+          {result.donationDeduction > 0 && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Donation Deduction</span>
+              <span className="font-medium">{formatCurrency(result.donationDeduction)}</span>
+            </div>
+          )}
           <div className="flex justify-between">
-            <span className="text-gray-600">Taxable Income</span>
+            <span className="text-gray-600">Chargeable Income</span>
             <span className="font-medium">{formatCurrency(result.taxableIncome)}</span>
           </div>
-          {(result.individualRebate > 0 || result.spouseRebate > 0) && (
+          <div className="flex justify-between">
+            <span className="text-gray-600">Tax Before Rebates</span>
+            <span className="font-medium">{formatCurrency(result.totalTax)}</span>
+          </div>
+          {(result.individualRebate > 0 || result.spouseRebate > 0 || result.zakatRebate > 0) && (
             <div className="flex justify-between text-green-600">
-              <span>Tax Rebate</span>
-              <span>-{formatCurrency(result.individualRebate + result.spouseRebate)}</span>
+              <span>Total Rebates</span>
+              <span>-{formatCurrency(result.individualRebate + result.spouseRebate + result.zakatRebate)}</span>
             </div>
           )}
           <div className="border-t border-gray-200 pt-2">
             <div className="flex justify-between">
-              <span className="font-medium text-gray-700">Total Tax</span>
-              <span className="font-semibold text-blue-600">{formatCurrency(result.totalTax)}</span>
+              <span className="font-medium text-gray-700">Tax Payable</span>
+              <span className="font-semibold text-blue-600">{formatCurrency(result.taxPayable)}</span>
             </div>
           </div>
         </div>

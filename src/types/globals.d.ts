@@ -4,10 +4,6 @@ declare module '*.css' {
 }
 
 declare module 'tailwindcss' {
-  const content: any;
+  const content: Record<string, unknown>;
   export default content;
-}
-
-interface Window {
-  // Add any custom window properties here
 }

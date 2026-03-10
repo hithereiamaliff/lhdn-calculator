@@ -5,7 +5,7 @@ type InputChangeEvent = { target: { name: string; value: string; type: string; c
 
 // Import the actual components and utilities
 import { TaxInput, TaxResult, initialState as initialTaxState } from '../types/tax'; 
-import { calculateTax, reliefLimits } from '../utils/taxCalculator'; 
+import { calculateTax, getNonTaxableThreshold, reliefLimits } from '../utils/taxCalculator'; 
 import { formatCurrency } from '../utils/formatter'; 
 import TaxPayerInfo from './tax-form/TaxPayerInfo';
 import Disclaimer from './tax-form/Disclaimer';
@@ -31,6 +31,9 @@ function TaxForm() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [externalLink, setExternalLink] = useState<ExternalLinkInfo>({ url: '', siteName: '' });
+  const nonTaxableThreshold = getNonTaxableThreshold(input);
+  const canSkipReliefSteps = input.annualIncome > 0 && input.annualIncome <= nonTaxableThreshold;
+  const canProceedFromStepOne = input.annualIncome > 0;
 
   const handleExternalLinkClick = (e: React.MouseEvent, url: string, siteName: string) => {
     e.preventDefault();
@@ -78,6 +81,17 @@ function TaxForm() {
   };
 
   const nextStep = () => {
+    if (currentStep === 1 && !canProceedFromStepOne) {
+      return;
+    }
+
+    if (currentStep === 1 && canSkipReliefSteps) {
+      setCurrentStep(4);
+      scrollToTop();
+      calculateTaxWithAnimation();
+      return;
+    }
+
     const nextStepNumber = Math.min(currentStep + 1, 4);
     setCurrentStep(nextStepNumber);
     scrollToTop();
@@ -99,7 +113,12 @@ function TaxForm() {
         return (
           <>
             <Disclaimer />
-            <TaxPayerInfo input={input} onChange={handleInputChange} />
+            <TaxPayerInfo
+              input={input}
+              nonTaxableThreshold={nonTaxableThreshold}
+              canSkipReliefSteps={canSkipReliefSteps}
+              onChange={handleInputChange}
+            />
           </>
         ); 
       case 2:
@@ -124,7 +143,7 @@ function TaxForm() {
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Tax Calculation Results</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-gray-50 rounded">
-                      <p className="text-sm text-gray-600">Taxable Income</p>
+                      <p className="text-sm text-gray-600">Chargeable Income</p>
                       <p className="text-lg font-semibold">{formatCurrency(result.taxableIncome)}</p>
                     </div>
                     <div className="p-4 bg-blue-50 rounded">
@@ -170,9 +189,14 @@ function TaxForm() {
             <button
               type="button"
               onClick={nextStep}
-              className="ml-auto inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={currentStep === 1 && !canProceedFromStepOne}
+              className={`ml-auto inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                currentStep === 1 && !canProceedFromStepOne
+                  ? 'cursor-not-allowed bg-gray-300 text-gray-500'
+                  : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
+              }`}
             >
-              Next
+              {currentStep === 1 && canSkipReliefSteps ? 'See Result' : 'Next'}
               <ArrowRight className="w-5 h-5 ml-2" />
             </button>
           ) : null}

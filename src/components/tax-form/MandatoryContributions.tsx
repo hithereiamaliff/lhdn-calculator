@@ -83,6 +83,40 @@ const MandatoryContributions = ({
           <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.socso)}</p>
         </div>
       </div>
+
+      <h3 className="text-lg font-semibold text-gray-700 mt-6">Insurance</h3>
+      <div className="rounded-lg bg-gray-50 p-4 space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-600">
+            Life Insurance / Family Takaful Premium
+          </label>
+          <input
+            type="number"
+            name="lifeInsurance"
+            value={input.lifeInsurance || ''}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.epf.voluntary)}
+            min="0"
+            step="0.01"
+            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.lifeInsurance, reliefLimits.epf.voluntary) ? 'border-red-300' : 'border-gray-300'}`}
+          />
+          <p className="mt-1 text-sm text-gray-500">Shares RM{reliefLimits.epf.voluntary.toLocaleString()} sub-limit with EPF Additional Voluntary Contribution</p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-600">
+            Education & Medical Insurance
+          </label>
+          <input
+            type="number"
+            name="educationInsurance"
+            value={input.educationInsurance || ''}
+            onChange={createLimitedChangeHandler(onChange, reliefLimits.educationInsurance)}
+            min="0"
+            step="0.01"
+            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${isExceedingLimit(input.educationInsurance, reliefLimits.educationInsurance) ? 'border-red-300' : 'border-gray-300'}`}
+          />
+          <p className="mt-1 text-sm text-gray-500">Limited to {formatCurrency(reliefLimits.educationInsurance)}</p>
+        </div>
+      </div>
     </div>
   );
 };

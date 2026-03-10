@@ -6,6 +6,7 @@ export interface TaxBracket {
 }
 
 export type AssessmentType = 'single' | 'separate' | 'joint';
+export type HousingLoanTier = 'none' | 'tier1' | 'tier2';
 
 export interface TaxInput {
   annualIncome: number;
@@ -31,7 +32,6 @@ export interface TaxInput {
   // Education
   educationFees: number;
   upskilling: number;
-  childEducation: number;
   // Lifestyle
   lifestyle: number;
   lifestyleSports: number;
@@ -45,6 +45,7 @@ export interface TaxInput {
   // Children
   numChildrenBelow18: number;
   numChildrenAbove18Education: number;
+  numChildrenAbove18HigherEducation: number;
   numDisabledChildren: number;
   numDisabledChildrenStudying: number;
   // Others
@@ -54,17 +55,22 @@ export interface TaxInput {
   deferredAnnuityPrs: number;
   sspnDeposit: number; // Net deposit amount (total deposit minus withdrawal)
   evChargingFacilities: number;
+  // Housing loan interest (YA 2025)
+  housingLoanInterest: number;
+  housingLoanTier: HousingLoanTier;
 }
 
 export interface TaxResult {
   totalIncome: number;
   totalRelief: number;
+  donationDeduction: number;
   taxableIncome: number;
   taxPayable: number;
   totalTax: number;
   eligibleForTax: boolean;
   individualRebate: number;
   spouseRebate: number;
+  zakatRebate: number;
   effectiveRate: number;
   nonTaxableThreshold: number;
   assessmentType: AssessmentType;
@@ -97,7 +103,6 @@ export const initialState: TaxInput = {
   mentalHealth: 0,
   educationFees: 0,
   upskilling: 0,
-  childEducation: 0,
   lifestyle: 0,
   lifestyleSports: 0,
   childCare: 0,
@@ -110,8 +115,11 @@ export const initialState: TaxInput = {
   educationInsurance: 0,
   numChildrenBelow18: 0,
   numChildrenAbove18Education: 0,
+  numChildrenAbove18HigherEducation: 0,
   numDisabledChildren: 0,
   numDisabledChildrenStudying: 0,
   zakat: 0,
   donations: 0,
+  housingLoanInterest: 0,
+  housingLoanTier: 'none',
 };
