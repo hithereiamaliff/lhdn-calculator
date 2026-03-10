@@ -1,0 +1,2 @@
+## Redirect old domain to new domain
+https://lhdn-calculator.techmavie.digital/* https://mytaxcalculator.techmavie.digital/:splat 301!
