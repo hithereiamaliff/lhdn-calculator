@@ -211,7 +211,7 @@ function TaxForm() {
           <span>{t('footer.taxInfoFrom')}</span>
           <a
             href="#"
-            onClick={(e) => handleExternalLinkClick(e, 'https://www.hasil.gov.my/en/individual/introduction-individual-income-tax/', t('footer.lhdnWebsite'))}
+            onClick={(e) => handleExternalLinkClick(e, t('footer.lhdnUrl'), t('footer.lhdnWebsite'))}
             className="inline-flex items-center text-blue-600 hover:text-blue-800 cursor-pointer"
           >
             {t('footer.lhdnWebsite')}
