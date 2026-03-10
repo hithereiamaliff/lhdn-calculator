@@ -148,6 +148,17 @@
       "item5": "LHDN masih boleh menaikkan taksiran tambahan setelah menerima penyata anda",
       "note": "Kalkulator ini hanya menganggarkan jumlah liabiliti cukai anda berdasarkan pendapatan dan pelepasan. Bayaran cukai sebenar anda bergantung kepada jumlah PCB dan taksiran LHDN."
     },
+    "sspn": {
+      "title": "Cara Mengira Deposit Bersih SSPN",
+      "body": "SSPN (Skim Simpanan Pendidikan Nasional) adalah skim simpanan pendidikan kebangsaan. Pelepasan cukai adalah berdasarkan deposit bersih anda untuk tahun tersebut.",
+      "formula": "Deposit Bersih = Jumlah Deposit − Jumlah Pengeluaran",
+      "formulaDesc": "Hanya jumlah bersih (deposit tolak pengeluaran) yang layak untuk pelepasan cukai.",
+      "exampleTitle": "Contoh:",
+      "example1": "Anda mendepositkan RM10,000 sepanjang tahun",
+      "example2": "Anda mengeluarkan RM2,000 sepanjang tahun",
+      "example3": "Deposit bersih anda = RM10,000 − RM2,000 = RM8,000",
+      "note": "Jika pengeluaran melebihi deposit, deposit bersih adalah sifar (tiada pelepasan). Pelepasan maksimum ialah RM8,000."
+    },
     "urlVerify": {
       "title": "Sahkan Pautan Luar",
       "aboutToVisit": "Anda akan melawat <strong>{{siteName}}</strong>.",

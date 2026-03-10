@@ -1,7 +1,8 @@
-import type { ChangeEvent } from 'react';
+import { type ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaxInput } from '../../types/tax';
 import { reliefLimits } from '../../utils/taxCalculator';
+import SSPNInfoModal from '../modals/SSPNInfoModal';
 
 type TaxReliefsProps = {
   input: TaxInput;
@@ -36,11 +37,13 @@ const TaxReliefs = ({
   formatCurrency,
 }: TaxReliefsProps) => {
   const { t } = useTranslation();
+  const [showSSPNInfo, setShowSSPNInfo] = useState(false);
   const housingLoanLimit = input.housingLoanTier === 'tier1' ? reliefLimits.housingLoanInterest.tier1
     : input.housingLoanTier === 'tier2' ? reliefLimits.housingLoanInterest.tier2
     : 0;
 
   return (
+    <>
     <div className="space-y-6">
       {/* Medical Expenses */}
       <div className="space-y-4 border-b pb-4">
@@ -188,8 +191,17 @@ const TaxReliefs = ({
         <h4 className="text-md font-medium text-gray-700">{t('reliefs.savingsRetirement')}</h4>
 
         <div>
-          <label htmlFor="sspnDeposit" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="sspnDeposit" className="flex items-center text-sm font-medium text-gray-700">
             {t('reliefs.sspn')}
+            <button
+              type="button"
+              onClick={() => setShowSSPNInfo(true)}
+              className="ml-1 text-blue-500 hover:text-blue-600"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
           </label>
           <input
             type="number"
@@ -454,6 +466,8 @@ const TaxReliefs = ({
         </div>
       </div>
     </div>
+    <SSPNInfoModal isOpen={showSSPNInfo} onClose={() => setShowSSPNInfo(false)} />
+    </>
   );
 };
 

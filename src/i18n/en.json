@@ -148,6 +148,17 @@
       "item5": "LHDN can still raise additional assessments upon receiving your return",
       "note": "This calculator only estimates your total tax liability based on income and reliefs. Your actual tax payment will depend on your MTD amounts and LHDN's assessment."
     },
+    "sspn": {
+      "title": "How to Calculate SSPN Net Deposit",
+      "body": "SSPN (Skim Simpanan Pendidikan Nasional) is a national education savings scheme. The tax relief is based on your net deposit for the year.",
+      "formula": "Net Deposit = Total Deposits − Total Withdrawals",
+      "formulaDesc": "Only the net amount (deposits minus withdrawals) qualifies for tax relief.",
+      "exampleTitle": "Example:",
+      "example1": "You deposited RM10,000 throughout the year",
+      "example2": "You withdrew RM2,000 during the year",
+      "example3": "Your net deposit = RM10,000 − RM2,000 = RM8,000",
+      "note": "If your withdrawals exceed your deposits, the net deposit is zero (no relief). The maximum relief is RM8,000."
+    },
     "urlVerify": {
       "title": "Verify External Link",
       "aboutToVisit": "You are about to visit <strong>{{siteName}}</strong>.",
